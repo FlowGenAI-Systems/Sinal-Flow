@@ -1,0 +1,31 @@
+kind = "slides"
+previewPath = "/sinal-deck/"
+title = "Sinal — Apresentação"
+version = "1.0.0"
+id = "artifacts/sinal-deck"
+router = "path"
+
+[[integratedSkills]]
+name = "slides"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/sinal-deck/" ]
+localPort = 18836
+
+[services.development]
+run = "pnpm --filter @workspace/sinal-deck run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/sinal-deck", "run", "build" ]
+publicDir = "artifacts/sinal-deck/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18836"
+BASE_PATH = "/sinal-deck/"

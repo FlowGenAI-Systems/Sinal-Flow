@@ -1,0 +1,68 @@
+modules = ["nodejs-24", "python-3.11", "postgresql-16"]
+
+[deployment]
+router = "application"
+deploymentTarget = "autoscale"
+
+[deployment.postBuild]
+args = ["pnpm", "store", "prune"]
+env = { "CI" = "true" }
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Backfill Text (OpenRouter)"
+
+[[workflows.workflow]]
+name = "Backfill Text (OpenRouter)"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "CLASSIFY_PROVIDER=openrouter CONCURRENCY=6 BATCH_SIZE=15 PAGE=900 pnpm --filter @workspace/scripts run backfill-text-full"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[agent]
+stack = "PNPM_WORKSPACE"
+expertMode = true
+integrations = ["github:1.0.0"]
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 180000
+
+[[ports]]
+localPort = 4517
+externalPort = 3001
+
+[[ports]]
+localPort = 8080
+externalPort = 80
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
+
+[[ports]]
+localPort = 8082
+externalPort = 4200
+
+[[ports]]
+localPort = 18836
+externalPort = 5000
+
+[[ports]]
+localPort = 24227
+externalPort = 3000
+
+[nix]
+channel = "stable-25_05"

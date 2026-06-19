@@ -1,0 +1,106 @@
+[
+  {
+    "id": "title",
+    "position": 1,
+    "filepath": "src/pages/slides/Title.tsx",
+    "title": "Sinal",
+    "description": "Slide de abertura: Sinal, inteligência de WhatsApp + CRM sobre ~85 mil mensagens.",
+    "speakerNotes": "Apresente o Sinal: um cockpit que transforma cerca de 85 mil mensagens de WhatsApp em decisões. Sete áreas de inteligência, tudo em português, open source e construído no Replit."
+  },
+  {
+    "id": "problema",
+    "position": 2,
+    "filepath": "src/pages/slides/Problema.tsx",
+    "title": "O problema",
+    "description": "O WhatsApp cheio vira ruído: volume, perda de mensagens importantes e falta de visão.",
+    "speakerNotes": "Explique a dor: dezenas de grupos e conversas geram ruído. Mensagens importantes se perdem, convites ficam sem resposta. O princípio do Sinal é que nenhum número é beco sem saída."
+  },
+  {
+    "id": "como-funciona",
+    "position": 3,
+    "filepath": "src/pages/slides/ComoFunciona.tsx",
+    "title": "Como funciona",
+    "description": "Pipeline: captura no Supabase, classificação por IA, enriquecimento incremental e cockpit.",
+    "speakerNotes": "Mostre o caminho do dado: as mensagens ficam no Supabase em modo somente leitura, a IA classifica cada uma, um pipeline incremental monta contatos, pautas e menções, e tudo aparece no cockpit."
+  },
+  {
+    "id": "visao-geral",
+    "position": 4,
+    "filepath": "src/pages/slides/VisaoGeral.tsx",
+    "title": "Visão Geral",
+    "description": "Área 01: cockpit diário com KPIs, tarefas em aberto, volume e top pautas.",
+    "speakerNotes": "Esta é a tela inicial. KPIs do período, tarefas em aberto por urgência, tendência de volume e as pautas mais quentes do privado. Em segundos você sabe o que precisa de atenção."
+  },
+  {
+    "id": "privado",
+    "position": 5,
+    "filepath": "src/pages/slides/Privado.tsx",
+    "title": "Privado",
+    "description": "Área 02: inteligência das conversas um a um — categorias, convites, pautas e tempo.",
+    "speakerNotes": "Aqui estão as conversas individuais classificadas por categoria e intenção, com convites e pedidos destacados, além do tempo investido em cada contato."
+  },
+  {
+    "id": "grupos",
+    "position": 6,
+    "filepath": "src/pages/slides/Grupos.tsx",
+    "title": "Grupos",
+    "description": "Área 03: leitura cruzada de grupos, pautas entre comunidades e digests por grupo.",
+    "speakerNotes": "Leitura cruzada de dezenas de grupos. Pautas que atravessam comunidades, resumo de cada grupo sob demanda e filtro de grupos de suporte para reduzir ruído."
+  },
+  {
+    "id": "mencoes",
+    "position": 7,
+    "filepath": "src/pages/slides/Mencoes.tsx",
+    "title": "Menções",
+    "description": "Área 04: quem fala de você, com trecho real e classificação da intenção.",
+    "speakerNotes": "Quem está falando de você e de entidades monitoradas, com a citação original. As menções são classificadas em elogio, crítica, objeção, lead e recomendação."
+  },
+  {
+    "id": "contatos",
+    "position": 8,
+    "filepath": "src/pages/slides/Contatos.tsx",
+    "title": "Contatos",
+    "description": "Área 05: CRM a partir das conversas — perfis editáveis, histórico e volume.",
+    "speakerNotes": "Um CRM montado automaticamente a partir das conversas privadas: perfis editáveis, histórico de interação e volume de mensagens por pessoa."
+  },
+  {
+    "id": "midia",
+    "position": 9,
+    "filepath": "src/pages/slides/Midia.tsx",
+    "title": "Mídia",
+    "description": "Área 06: panorama de áudios, imagens e documentos por contato e por grupo.",
+    "speakerNotes": "Panorama do que circula além do texto: áudios, imagens e documentos, com contagem por tipo e distribuição por contato e grupo."
+  },
+  {
+    "id": "salvos",
+    "position": 10,
+    "filepath": "src/pages/slides/Salvos.tsx",
+    "title": "Salvos & Tasks",
+    "description": "Área 07: itens salvos, triagem de convites e tarefas por urgência.",
+    "speakerNotes": "Onde decisões viram ações: salve qualquer mensagem ou contato, faça a triagem de convites e acompanhe tarefas por prazo, das mais urgentes primeiro."
+  },
+  {
+    "id": "construido-no-replit",
+    "position": 11,
+    "filepath": "src/pages/slides/Replit.tsx",
+    "title": "Construído no Replit",
+    "description": "Stack e processo: frontend, backend, dados, IA e operação, tudo no Replit.",
+    "speakerNotes": "Tudo foi desenvolvido e roda no Replit: React no frontend, Express no backend, Supabase/Postgres com Drizzle nos dados, OpenAI na IA e um pipeline agendado para manter tudo atualizado."
+  },
+  {
+    "id": "valor",
+    "position": 12,
+    "filepath": "src/pages/slides/Valor.tsx",
+    "title": "Valor gerado",
+    "description": "Resultado: foco, memória e visão — de ~85 mil mensagens a decisões.",
+    "speakerNotes": "Resuma o valor: foco no que precisa de resposta, memória das conversas como CRM e visão de tendências, menções e mídia em um só lugar. Todo número leva à mensagem de origem."
+  },
+  {
+    "id": "open-source",
+    "position": 13,
+    "filepath": "src/pages/slides/OpenSource.tsx",
+    "title": "Open source",
+    "description": "Encerramento: o Sinal será aberto — conecte, rode o pipeline e use o cockpit.",
+    "speakerNotes": "Encerre convidando: o Sinal será disponibilizado como open source. Conecte sua base, rode o pipeline e use o cockpit. Em breve no GitHub, construído no Replit."
+  }
+]
