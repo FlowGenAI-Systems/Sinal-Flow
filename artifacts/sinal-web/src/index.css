@@ -34,9 +34,9 @@
   --color-destructive: var(--danger);
   --color-destructive-foreground: #000;
 
-  --font-sans: 'Satoshi', sans-serif;
-  --font-display: 'Clash Display', sans-serif;
-  --font-mono: 'Geist Mono', monospace;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Sora', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius);
@@ -44,24 +44,24 @@
 }
 
 :root {
-  --bg: #0A0A0C; 
-  --surface: #121217; 
-  --surface-2: #181820; 
-  --surface-3: #1F1F29;
-  --border: #26262F; 
-  --border-soft: #1D1D25;
-  --text: #ECECF1; 
-  --muted: #8C8C99; 
-  --muted-2: #5E5E6B;
-  --accent: #35E0D8; 
-  --accent-dim: #1c6863; 
-  --accent-glow: rgba(53,224,216,.14);
-  --ok: #4ADE80; 
-  --warn: #FBBF24; 
-  --danger: #F87171; 
+  --bg: #0B1120;
+  --surface: #0F172A;
+  --surface-2: #16213A;
+  --surface-3: #1E2B47;
+  --border: #1E293B;
+  --border-soft: #172033;
+  --text: #F4F6F9;
+  --muted: #94A3B8;
+  --muted-2: #64748B;
+  --accent: #2DD4BF;
+  --accent-dim: #0F766E;
+  --accent-glow: rgba(45,212,191,.14);
+  --ok: #22C55E;
+  --warn: #F59E0B;
+  --danger: #EF4444;
   --info: #60A5FA;
-  --radius: 14px; 
-  --radius-sm: 9px;
+  --radius: 16px;
+  --radius-sm: 10px;
 }
 
 @layer base {
