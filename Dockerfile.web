@@ -13,4 +13,5 @@ ENV NODE_ENV=production
 ENV PORT=8080
 ENV BASE_PATH=/
 EXPOSE 8080
-CMD ["pnpm", "--filter", "@workspace/sinal-web", "run", "serve"]
+# Servidor próprio: serve o front E repassa /api para a API
+CMD ["node", "artifacts/sinal-web/serve.mjs"]
