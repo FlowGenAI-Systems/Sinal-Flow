@@ -24,7 +24,7 @@ export default function Login() {
       <div className="w-full max-w-sm flex flex-col items-center z-10">
         <div className="mb-8"><FlowgenIcon size={56} /></div>
         
-        <h1 className="font-display font-semibold text-3xl tracking-wide mb-2 text-white">Bem-vindo ao SinalFlow</h1>
+        <h1 className="font-display font-semibold text-3xl tracking-wide mb-2 text-[var(--ink)]">Bem-vindo ao SinalFlow</h1>
         <p className="text-[var(--muted)] text-sm font-mono mb-8">WhatsApp Intelligence + CRM</p>
 
         <form onSubmit={handleSubmit} className="w-full bg-[var(--surface)] border border-[var(--border-soft)] rounded-[var(--radius)] p-6 shadow-xl">

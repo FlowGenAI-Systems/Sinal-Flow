@@ -1,39 +1,40 @@
 import React from "react";
 
 /**
- * Logo oficial FlowgenAI para o app (cockpit dark).
- * - <FlowgenIcon/>  : só o grafismo do fluxo (sidebar compacta / favicon).
- * - <FlowgenLogo/>  : grafismo + wordmark "FlowgenAI" (Sora 800, "AI" em teal).
- * Cores da marca: navy #0F172A · branco · acento #2DD4BF · azul #60A5FA.
+ * Logo oficial FlowgenAI para a sidebar navy do cockpit.
+ * <FlowgenLogo/> = ícone (placa teal) + wordmark "FlowgenAI" (Sora, "AI" em teal vivo).
+ * Igual ao header da sidebar do FlowgenAI OS - Cockpit.
  */
-
-export function FlowgenIcon({ size = 36, plated = true }: { size?: number; plated?: boolean }) {
+export function FlowgenIcon({ size = 38 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" role="img" aria-label="FlowgenAI">
-      {plated && <rect width="64" height="64" rx="16" fill="#141E33" />}
-      <path d="M20 46V18H44V28H30V46" stroke="#FFFFFF" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="20" cy="18" r="4.5" fill="#60A5FA" />
-      <circle cx="44" cy="28" r="4.5" fill="#2DD4BF" />
-      <circle cx="30" cy="46" r="4.5" fill="#2DD4BF" />
-    </svg>
+    <span
+      style={{
+        width: size, height: size, borderRadius: 11, flex: "none",
+        background: "rgba(45,212,191,.12)", border: "1px solid rgba(45,212,191,.2)",
+        display: "grid", placeItems: "center", color: "#2DD4BF",
+      }}
+    >
+      <svg width={size * 0.52} height={size * 0.52} viewBox="0 0 64 64" fill="none" role="img" aria-label="FlowgenAI">
+        <path d="M20 46V18H44V28H30V46" stroke="currentColor" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="20" cy="18" r="4.5" fill="#60A5FA" />
+        <circle cx="44" cy="28" r="4.5" fill="currentColor" />
+        <circle cx="30" cy="46" r="4.5" fill="currentColor" />
+      </svg>
+    </span>
   );
 }
 
-export function FlowgenLogo({ iconSize = 32 }: { iconSize?: number }) {
+export function FlowgenLogo() {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-      <FlowgenIcon size={iconSize} />
-      <span
-        style={{
-          fontFamily: "'Sora', system-ui, sans-serif",
-          fontWeight: 800,
-          fontSize: "1.15rem",
-          letterSpacing: "-0.02em",
-          color: "#FFFFFF",
-          lineHeight: 1,
-        }}
-      >
-        Flowgen<span style={{ color: "#2DD4BF" }}>AI</span>
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <FlowgenIcon />
+      <span style={{ lineHeight: 1.1 }}>
+        <b style={{ fontFamily: "'Sora',sans-serif", fontSize: 15, fontWeight: 700, color: "#fff", display: "block" }}>
+          Flowgen<span style={{ color: "#2DD4BF" }}>AI</span>
+        </b>
+        <span style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: 11, color: "#8694A8" }}>
+          sinal &gt; ruído
+        </span>
       </span>
     </div>
   );

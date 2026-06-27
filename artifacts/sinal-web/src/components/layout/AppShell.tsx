@@ -4,7 +4,7 @@ import { useLogout, useMe } from "@/lib/api";
 import { useTimeWindow, TIME_WINDOWS } from "@/lib/timeWindow";
 import CommandPalette from "@/components/CommandPalette";
 import RefreshControl from "@/components/RefreshControl";
-import { FlowgenIcon } from "@/components/FlowgenLogo";
+import { FlowgenLogo } from "@/components/FlowgenLogo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -64,16 +64,12 @@ export default function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="grid grid-cols-[236px_1fr] h-screen bg-[var(--bg)] text-[var(--text)] overflow-hidden font-sans">
       {/* Sidebar */}
-      <aside className="bg-[var(--surface)] border-r border-[var(--border-soft)] flex flex-col p-[18px_14px] gap-[4px] h-screen">
+      <aside className="bg-[var(--sidebar)] border-r border-[var(--sidebar-line)] flex flex-col p-[18px_14px] gap-[4px] h-screen">
         <div className="flex items-center gap-[10px] p-[6px_8px_18px]">
-          <FlowgenIcon size={34} />
-          <div>
-            <div className="font-display font-bold text-[19px] tracking-[0.01em] leading-none">SinalFlow</div>
-            <div className="font-mono text-[10.5px] text-[var(--muted-2)] tracking-[0.05em] mt-[2px]">sinal &gt; ruído</div>
-          </div>
+          <FlowgenLogo />
         </div>
 
-        <div className="text-[10.5px] uppercase tracking-[0.12em] text-[var(--muted-2)] p-[14px_10px_6px]">Inteligência</div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--sidebar-muted)] p-[14px_10px_6px]">Inteligência</div>
         
         {navItems.map((item) => {
           const isActive = location === item.href;
@@ -82,19 +78,19 @@ export default function AppShell({ children }: { children: ReactNode }) {
               key={item.href} 
               href={item.href}
               className={`flex items-center gap-[11px] p-[8px_10px] rounded-[var(--radius-sm)] text-[13.5px] font-medium transition-[0.16s] relative select-none cursor-pointer ${
-                isActive ? "bg-[var(--surface-3)] text-[var(--text)]" : "text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+                isActive ? "bg-[rgba(45,212,191,0.10)] text-white" : "text-[var(--sidebar-muted)] hover:bg-[rgba(255,255,255,0.04)] hover:text-white"
               }`}
             >
               {isActive && (
-                <div className="absolute left-[-14px] top-[8px] bottom-[8px] w-[3px] rounded-r-[3px] bg-[var(--accent)] shadow-[0_0_10px_var(--accent)]" />
+                <div className="absolute left-[-14px] top-[8px] bottom-[8px] w-[2px] rounded-r-[3px] bg-[var(--accent)]" />
               )}
-              <div className="w-[17px] h-[17px] opacity-85 shrink-0 [&>svg]:w-full [&>svg]:h-full">{item.icon}</div>
+              <div className={`w-[17px] h-[17px] shrink-0 [&>svg]:w-full [&>svg]:h-full ${isActive ? "text-[var(--accent)]" : "opacity-85"}`}>{item.icon}</div>
               <span>{item.label}</span>
             </Link>
           );
         })}
 
-        <div className="text-[10.5px] uppercase tracking-[0.12em] text-[var(--muted-2)] p-[14px_10px_6px]">Relacionamento</div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--sidebar-muted)] p-[14px_10px_6px]">Relacionamento</div>
 
         {relItems.map((item) => {
           const isActive = location === item.href;
@@ -103,35 +99,35 @@ export default function AppShell({ children }: { children: ReactNode }) {
               key={item.href} 
               href={item.href}
               className={`flex items-center gap-[11px] p-[8px_10px] rounded-[var(--radius-sm)] text-[13.5px] font-medium transition-[0.16s] relative select-none cursor-pointer ${
-                isActive ? "bg-[var(--surface-3)] text-[var(--text)]" : "text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+                isActive ? "bg-[rgba(45,212,191,0.10)] text-white" : "text-[var(--sidebar-muted)] hover:bg-[rgba(255,255,255,0.04)] hover:text-white"
               }`}
             >
               {isActive && (
-                <div className="absolute left-[-14px] top-[8px] bottom-[8px] w-[3px] rounded-r-[3px] bg-[var(--accent)] shadow-[0_0_10px_var(--accent)]" />
+                <div className="absolute left-[-14px] top-[8px] bottom-[8px] w-[2px] rounded-r-[3px] bg-[var(--accent)]" />
               )}
-              <div className="w-[17px] h-[17px] opacity-85 shrink-0 [&>svg]:w-full [&>svg]:h-full">{item.icon}</div>
+              <div className={`w-[17px] h-[17px] shrink-0 [&>svg]:w-full [&>svg]:h-full ${isActive ? "text-[var(--accent)]" : "opacity-85"}`}>{item.icon}</div>
               <span>{item.label}</span>
             </Link>
           );
         })}
 
         <div className="mt-auto flex flex-col gap-[8px]">
-          <div onClick={() => logout.mutate()} className="flex items-center gap-[10px] p-[9px_10px] border border-[var(--border)] rounded-[var(--radius-sm)] bg-[var(--surface-2)] cursor-pointer hover:border-[var(--accent-dim)] transition-[0.16s]">
-            <div className="w-[26px] h-[26px] rounded-[7px] bg-gradient-to-br from-[#3a3a48] to-[#23232c] flex items-center justify-center font-bold text-[12px] text-[var(--accent)]">
+          <div onClick={() => logout.mutate()} className="flex items-center gap-[10px] p-[9px_10px] border border-[var(--sidebar-line)] rounded-[var(--radius-sm)] bg-[var(--sidebar-2)] cursor-pointer hover:border-[var(--accent-dim)] transition-[0.16s]">
+            <div className="w-[26px] h-[26px] rounded-[7px] bg-[rgba(45,212,191,0.12)] border border-[rgba(45,212,191,0.2)] flex items-center justify-center font-bold text-[12px] text-[var(--accent)]">
               {me?.user?.email?.charAt(0).toUpperCase() || "?"}
             </div>
             <div className="min-w-0">
-              <div className="text-[12.5px] font-semibold leading-[1.2] truncate">{me?.user?.email || "Conta"}</div>
-              <div className="text-[10.5px] text-[var(--muted-2)]">Workspace · plano Owner</div>
+              <div className="text-[12.5px] font-semibold leading-[1.2] truncate text-[var(--sidebar-fg)]">{me?.user?.email || "Conta"}</div>
+              <div className="text-[10.5px] text-[var(--sidebar-muted)]">Workspace · plano Owner</div>
             </div>
-            <svg className="ml-auto text-[var(--muted-2)]" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m7 9 5 5 5-5" strokeLinecap="round"/></svg>
+            <svg className="ml-auto text-[var(--sidebar-muted)]" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m7 9 5 5 5-5" strokeLinecap="round"/></svg>
           </div>
         </div>
       </aside>
 
       {/* Main Content */}
       <main className="h-screen overflow-y-auto relative flex flex-col">
-        <div className="sticky top-0 z-20 bg-[var(--bg)] border-b border-[var(--border-soft)] flex items-center gap-[16px] p-[14px_26px]">
+        <div className="sticky top-0 z-20 bg-[var(--surface)] border-b border-[var(--border)] flex items-center gap-[16px] p-[14px_26px]">
           <h1 className="font-display font-semibold text-[21px] tracking-[0.005em]">
             {[...navItems, ...relItems].find(i => i.href === location)?.label || "SinalFlow"}
           </h1>

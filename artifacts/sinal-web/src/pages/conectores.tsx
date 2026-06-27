@@ -29,7 +29,7 @@ function ConnectorCard({
 }) {
   return (
     <div className="flex items-center gap-[14px] p-[18px] border border-[var(--border-soft)] rounded-[var(--radius)] bg-[var(--surface)]">
-      <div className="w-[44px] h-[44px] rounded-[11px] flex items-center justify-center bg-[var(--surface-3)] text-[#F4F6F9] shrink-0">
+      <div className="w-[44px] h-[44px] rounded-[11px] flex items-center justify-center bg-[var(--accent-subtle)] text-[var(--accent-dim)] shrink-0">
         {icon}
       </div>
       <div className="min-w-0">
