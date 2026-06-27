@@ -1,21 +1,16 @@
 # Sinal — Serviço Web (frontend React/Vite)
-# Builda o frontend e o serve, encaminhando /api para o serviço de API.
 FROM node:24
 WORKDIR /app
 
-RUN corepack enable
-COPY . .
-RUN pnpm install --frozen-lockfile
+RUN corepack enable && corepack prepare pnpm@10.4.1 --activate
 
-# Compila o frontend (precisa de PORT e BASE_PATH já na build)
+COPY . .
+RUN pnpm install
+
 RUN PORT=8080 BASE_PATH=/ NODE_ENV=production pnpm --filter @workspace/sinal-web run build
 
 ENV NODE_ENV=production
 ENV PORT=8080
 ENV BASE_PATH=/
-# IMPORTANTE: no EasyPanel, defina API_PROXY_TARGET apontando para o serviço de API,
-# ex.: http://sinal-api:8080  — sem isso, /api não acha o servidor.
 EXPOSE 8080
-
-# Serve o frontend compilado e faz proxy de /api para a API.
 CMD ["pnpm", "--filter", "@workspace/sinal-web", "run", "serve"]
