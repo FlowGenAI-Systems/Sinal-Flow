@@ -1,0 +1,74 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --color-border: var(--border);
+  --color-input: var(--surface-2);
+  --color-ring: var(--accent);
+
+  --color-card: var(--surface);
+  --color-card-foreground: var(--text);
+  --color-card-border: var(--border-soft);
+
+  --color-popover: var(--surface-2);
+  --color-popover-foreground: var(--text);
+  --color-popover-border: var(--border-soft);
+
+  --color-primary: var(--accent);
+  --color-primary-foreground: #06201e;
+
+  --color-secondary: var(--surface-2);
+  --color-secondary-foreground: var(--text);
+
+  --color-muted: var(--surface-3);
+  --color-muted-foreground: var(--muted);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: #06201e;
+
+  --color-destructive: var(--danger);
+  --color-destructive-foreground: #000;
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Sora', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+}
+
+:root {
+  --bg: #0B1120;
+  --surface: #0F172A;
+  --surface-2: #16213A;
+  --surface-3: #1E2B47;
+  --border: #1E293B;
+  --border-soft: #172033;
+  --text: #F4F6F9;
+  --muted: #94A3B8;
+  --muted-2: #64748B;
+  --accent: #2DD4BF;
+  --accent-dim: #0F766E;
+  --accent-glow: rgba(45,212,191,.14);
+  --ok: #22C55E;
+  --warn: #F59E0B;
+  --danger: #EF4444;
+  --info: #60A5FA;
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
