@@ -144,7 +144,7 @@ function TopicDrawer({
               {examples?.map((m, i) => (
                 <div key={i} className="flex gap-[11px] py-[2px]">
                   <div
-                    className={`w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 text-[10.5px] font-bold ${m.direction === "inbound" ? "bg-[var(--surface-3)] text-[var(--info)]" : "bg-[rgba(53,224,216,0.1)] text-[var(--accent)]"}`}
+                    className={`w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 text-[10.5px] font-bold ${m.direction === "inbound" ? "bg-[var(--surface-3)] text-[var(--info)]" : "bg-[rgba(45,212,191,0.1)] text-[var(--accent)]"}`}
                   >
                     {m.direction === "inbound" ? "IN" : "OUT"}
                   </div>
@@ -241,8 +241,8 @@ const CLOUD_COLORS = [
   "#60A5FA",
   "#A78BFA",
   "#F472B6",
-  "#FBBF24",
-  "#4ADE80",
+  "#F59E0B",
+  "#22C55E",
 ];
 
 function WordCloud({
@@ -609,10 +609,10 @@ export default function Overview() {
                   <span
                     className={`inline-flex items-center gap-[3px] text-[11px] font-semibold px-[8px] py-[2px] rounded-full shrink-0 ${
                       item.isNew
-                        ? "bg-[rgba(53,224,216,0.12)] text-[var(--accent)]"
+                        ? "bg-[rgba(45,212,191,0.12)] text-[var(--accent)]"
                         : rising
                           ? "bg-[rgba(74,222,128,0.12)] text-[var(--ok)]"
-                          : "bg-[rgba(248,113,113,0.12)] text-[var(--danger)]"
+                          : "bg-[rgba(239,68,68,0.12)] text-[var(--danger)]"
                     }`}
                   >
                     {item.isNew ? (
@@ -715,7 +715,7 @@ export default function Overview() {
                 className="flex items-center gap-3 py-[10px] px-2 -mx-2 rounded-[9px] hover:bg-[var(--surface-2)] cursor-pointer transition-[0.14s] text-left"
               >
                 <div
-                  className="w-[32px] h-[32px] rounded-full text-[#0A0A0C] flex items-center justify-center text-[12px] font-semibold shrink-0"
+                  className="w-[32px] h-[32px] rounded-full text-[#0B1120] flex items-center justify-center text-[12px] font-semibold shrink-0"
                   style={{
                     backgroundColor: CLOUD_COLORS[i % CLOUD_COLORS.length],
                   }}
@@ -734,7 +734,7 @@ export default function Overview() {
                   </div>
                 </div>
                 {c.open_tasks > 0 && (
-                  <span className="inline-flex items-center gap-[4px] text-[11px] px-[8px] py-[2px] rounded-full bg-[rgba(53,224,216,0.12)] text-[var(--accent)] font-medium shrink-0">
+                  <span className="inline-flex items-center gap-[4px] text-[11px] px-[8px] py-[2px] rounded-full bg-[rgba(45,212,191,0.12)] text-[var(--accent)] font-medium shrink-0">
                     <ListChecks className="w-3 h-3" /> {c.open_tasks}
                   </span>
                 )}

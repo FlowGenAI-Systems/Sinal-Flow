@@ -45,12 +45,12 @@ import {
 } from "lucide-react";
 
 const TAG_PALETTE = [
-  "#35E0D8",
+  "#2DD4BF",
   "#60A5FA",
   "#A78BFA",
   "#F472B6",
-  "#FBBF24",
-  "#4ADE80",
+  "#F59E0B",
+  "#22C55E",
   "#FB923C",
   "#38BDF8",
 ];
@@ -334,7 +334,7 @@ function AnalysisSection({
             )}
           </div>
           {error && (
-            <div className="text-[12px] text-[var(--danger,#f87171)] mt-[8px]">
+            <div className="text-[12px] text-[var(--danger,#EF4444)] mt-[8px]">
               {error}
             </div>
           )}
@@ -817,7 +817,7 @@ function ContactDrawer({
                   className="flex gap-[11px] py-[12px] border-b border-[var(--border-soft)] last:border-none"
                 >
                   <div
-                    className={`w-[30px] h-[30px] rounded-[8px] flex items-center justify-center shrink-0 text-[13px] font-bold ${m.direction === "inbound" ? "bg-[var(--surface-3)] text-[var(--info)]" : "bg-[rgba(53,224,216,0.1)] text-[var(--accent)]"}`}
+                    className={`w-[30px] h-[30px] rounded-[8px] flex items-center justify-center shrink-0 text-[13px] font-bold ${m.direction === "inbound" ? "bg-[var(--surface-3)] text-[var(--info)]" : "bg-[rgba(45,212,191,0.1)] text-[var(--accent)]"}`}
                   >
                     {m.direction === "inbound" ? "IN" : "OUT"}
                   </div>
@@ -932,7 +932,7 @@ export default function Contatos() {
             onClick={() => setHasTasks((v) => !v)}
             className={`text-[12px] font-medium px-[12px] py-[8px] rounded-[8px] border cursor-pointer inline-flex items-center gap-[6px] ${
               hasTasks
-                ? "border-[var(--accent)] bg-[rgba(53,224,216,0.14)] text-[var(--accent)]"
+                ? "border-[var(--accent)] bg-[rgba(45,212,191,0.14)] text-[var(--accent)]"
                 : "border-[var(--border-soft)] text-[var(--muted)] hover:border-[var(--accent-dim)]"
             }`}
           >
@@ -966,7 +966,7 @@ export default function Contatos() {
             onClick={() => setFilterLabel(null)}
             className={`text-[12px] font-medium px-[10px] py-[4px] rounded-[7px] border cursor-pointer transition-[0.12s] ${
               filterLabel === null
-                ? "border-[var(--accent)] bg-[rgba(53,224,216,0.14)] text-[var(--accent)]"
+                ? "border-[var(--accent)] bg-[rgba(45,212,191,0.14)] text-[var(--accent)]"
                 : "border-[var(--border-soft)] text-[var(--muted)] hover:border-[var(--accent-dim)]"
             }`}
           >
@@ -1071,7 +1071,7 @@ export default function Contatos() {
                     </td>
                     <td className="py-[13px] px-[14px] border-b border-[var(--border-soft)] text-[13.5px] align-middle text-center">
                       {c.open_tasks > 0 ? (
-                        <span className="inline-flex items-center justify-center min-w-[20px] h-[20px] px-[6px] rounded-full bg-[rgba(53,224,216,0.14)] text-[var(--accent)] font-mono text-[11px] font-semibold">
+                        <span className="inline-flex items-center justify-center min-w-[20px] h-[20px] px-[6px] rounded-full bg-[rgba(45,212,191,0.14)] text-[var(--accent)] font-mono text-[11px] font-semibold">
                           {c.open_tasks}
                         </span>
                       ) : (

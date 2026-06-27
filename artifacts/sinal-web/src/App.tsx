@@ -27,12 +27,12 @@ function AuthGate({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0A0A0C] text-[#ECECF1]">
-        <div className="w-12 h-12 rounded-xl bg-[radial-gradient(120%_120%_at_30%_20%,var(--accent),var(--accent-dim))] flex items-center justify-center shadow-[0_0_0_1px_rgba(53,224,216,0.3),0_6px_18px_var(--accent-glow)] mb-6">
+      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0B1120] text-[#F4F6F9]">
+        <div className="w-12 h-12 rounded-xl bg-[radial-gradient(120%_120%_at_30%_20%,var(--accent),var(--accent-dim))] flex items-center justify-center shadow-[0_0_0_1px_rgba(45,212,191,0.3),0_6px_18px_var(--accent-glow)] mb-6">
           <Loader2 className="w-6 h-6 animate-spin text-[#06201e]" />
         </div>
         <h1 className="font-display font-semibold text-2xl tracking-wide">Sinal</h1>
-        <p className="text-sm text-[#8C8C99] mt-2 font-mono">Carregando inteligência...</p>
+        <p className="text-sm text-[#94A3B8] mt-2 font-mono">Carregando inteligência...</p>
       </div>
     );
   }

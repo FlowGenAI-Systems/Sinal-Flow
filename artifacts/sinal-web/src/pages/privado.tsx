@@ -54,12 +54,12 @@ type Period = (typeof PERIODS)[number];
 
 // Colorful but on-brand palette for charts.
 const PALETTE = [
-  "#35E0D8",
+  "#2DD4BF",
   "#60A5FA",
   "#A78BFA",
   "#F472B6",
-  "#FBBF24",
-  "#4ADE80",
+  "#F59E0B",
+  "#22C55E",
   "#FB923C",
   "#38BDF8",
 ];
@@ -164,7 +164,7 @@ function TopicDrawer({
           {topic && (
             <button
               onClick={() => onSave(topic)}
-              className="mb-[18px] text-[12px] font-semibold text-[var(--accent)] bg-[rgba(53,224,216,0.14)] border-none px-[12px] py-[6px] rounded-[8px] cursor-pointer inline-flex items-center gap-[6px] hover:bg-[rgba(53,224,216,0.22)]"
+              className="mb-[18px] text-[12px] font-semibold text-[var(--accent)] bg-[rgba(45,212,191,0.14)] border-none px-[12px] py-[6px] rounded-[8px] cursor-pointer inline-flex items-center gap-[6px] hover:bg-[rgba(45,212,191,0.22)]"
             >
               <Bookmark className="w-3.5 h-3.5" /> Salvar pauta
             </button>
@@ -179,7 +179,7 @@ function TopicDrawer({
                   className="flex gap-[11px] py-[2px] last:border-none"
                 >
                   <div
-                    className={`w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 text-[10.5px] font-bold ${m.direction === "inbound" ? "bg-[var(--surface-3)] text-[var(--info)]" : "bg-[rgba(53,224,216,0.1)] text-[var(--accent)]"}`}
+                    className={`w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 text-[10.5px] font-bold ${m.direction === "inbound" ? "bg-[var(--surface-3)] text-[var(--info)]" : "bg-[rgba(45,212,191,0.1)] text-[var(--accent)]"}`}
                   >
                     {m.direction === "inbound" ? "IN" : "OUT"}
                   </div>
@@ -272,7 +272,7 @@ function PendingDrawer({
           {contact && (
             <div className="flex flex-wrap items-center gap-[8px] mb-[20px]">
               {contact.unanswered && (
-                <span className="inline-flex items-center gap-[5px] text-[11px] font-semibold px-[9px] py-[3px] rounded-[7px] bg-[rgba(248,113,113,0.13)] text-[var(--danger)]">
+                <span className="inline-flex items-center gap-[5px] text-[11px] font-semibold px-[9px] py-[3px] rounded-[7px] bg-[rgba(239,68,68,0.13)] text-[var(--danger)]">
                   <AlertCircle className="w-3 h-3" /> Não respondida
                 </span>
               )}
@@ -282,7 +282,7 @@ function PendingDrawer({
                 </span>
               )}
               {contact.open_tasks > 0 && (
-                <span className="inline-flex items-center gap-[5px] text-[11px] font-semibold px-[9px] py-[3px] rounded-[7px] bg-[rgba(53,224,216,0.14)] text-[var(--accent)]">
+                <span className="inline-flex items-center gap-[5px] text-[11px] font-semibold px-[9px] py-[3px] rounded-[7px] bg-[rgba(45,212,191,0.14)] text-[var(--accent)]">
                   <ListChecks className="w-3 h-3" /> {contact.open_tasks} tarefa
                   {contact.open_tasks > 1 ? "s" : ""}
                 </span>
@@ -365,7 +365,7 @@ function PendingDrawer({
                         })
                       }
                       title="Marcar como concluída"
-                      className="shrink-0 inline-flex items-center gap-[5px] text-[11.5px] font-semibold px-[10px] py-[5px] rounded-[7px] bg-[rgba(53,224,216,0.14)] text-[var(--accent)] border-none cursor-pointer transition-[0.14s] hover:bg-[rgba(53,224,216,0.22)] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="shrink-0 inline-flex items-center gap-[5px] text-[11.5px] font-semibold px-[10px] py-[5px] rounded-[7px] bg-[rgba(45,212,191,0.14)] text-[var(--accent)] border-none cursor-pointer transition-[0.14s] hover:bg-[rgba(45,212,191,0.22)] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Check className="w-3.5 h-3.5" /> Concluir
                     </button>
@@ -424,7 +424,7 @@ function PendingDrawer({
                     className="flex gap-[11px] py-[2px] last:border-none"
                   >
                     <div
-                      className={`w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 text-[10.5px] font-bold ${m.direction === "inbound" ? "bg-[var(--surface-3)] text-[var(--info)]" : "bg-[rgba(53,224,216,0.1)] text-[var(--accent)]"}`}
+                      className={`w-[28px] h-[28px] rounded-[8px] flex items-center justify-center shrink-0 text-[10.5px] font-bold ${m.direction === "inbound" ? "bg-[var(--surface-3)] text-[var(--info)]" : "bg-[rgba(45,212,191,0.1)] text-[var(--accent)]"}`}
                     >
                       {m.direction === "inbound" ? "IN" : "OUT"}
                     </div>
@@ -778,7 +778,7 @@ export default function Privado() {
                         e.stopPropagation();
                         saveTopic(item.topic);
                       }}
-                      className="text-[11px] font-sans font-semibold text-[var(--accent)] bg-[rgba(53,224,216,0.14)] border-none px-[10px] py-[4px] rounded-[7px] cursor-pointer inline-flex items-center gap-[5px] transition-[0.14s] whitespace-nowrap hover:bg-[rgba(53,224,216,0.22)]"
+                      className="text-[11px] font-sans font-semibold text-[var(--accent)] bg-[rgba(45,212,191,0.14)] border-none px-[10px] py-[4px] rounded-[7px] cursor-pointer inline-flex items-center gap-[5px] transition-[0.14s] whitespace-nowrap hover:bg-[rgba(45,212,191,0.22)]"
                     >
                       <Bookmark className="w-3 h-3" /> salvar
                     </button>
@@ -878,7 +878,7 @@ export default function Privado() {
             </div>
             <button
               onClick={() => navigate("/salvos")}
-              className="inline-flex items-center gap-[5px] text-[11.5px] font-semibold text-[var(--accent)] bg-[rgba(53,224,216,0.14)] border-none px-[11px] py-[6px] rounded-[8px] cursor-pointer transition-[0.14s] whitespace-nowrap hover:bg-[rgba(53,224,216,0.22)]"
+              className="inline-flex items-center gap-[5px] text-[11.5px] font-semibold text-[var(--accent)] bg-[rgba(45,212,191,0.14)] border-none px-[11px] py-[6px] rounded-[8px] cursor-pointer transition-[0.14s] whitespace-nowrap hover:bg-[rgba(45,212,191,0.22)]"
             >
               <Handshake className="w-3.5 h-3.5" /> Triar convites
               {triagedCount > 0 && (
@@ -964,7 +964,7 @@ export default function Privado() {
               className="flex items-center gap-[12px] py-[11px] px-[8px] rounded-[9px] hover:bg-[var(--surface-2)] cursor-pointer transition-[0.14s]"
             >
               <div
-                className="w-[34px] h-[34px] rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0 text-[#0A0A0C]"
+                className="w-[34px] h-[34px] rounded-full flex items-center justify-center text-[13px] font-semibold shrink-0 text-[#0B1120]"
                 style={{ backgroundColor: PALETTE[i % PALETTE.length] }}
               >
                 {p.name?.substring(0, 2)?.toUpperCase() || "U"}
@@ -979,12 +979,12 @@ export default function Privado() {
               </div>
               <div className="flex items-center gap-[8px] shrink-0">
                 {p.unanswered && (
-                  <span className="text-[11px] px-[9px] py-[2px] rounded-full font-medium whitespace-nowrap bg-[rgba(248,113,113,0.13)] text-[var(--danger)]">
+                  <span className="text-[11px] px-[9px] py-[2px] rounded-full font-medium whitespace-nowrap bg-[rgba(239,68,68,0.13)] text-[var(--danger)]">
                     não respondida
                   </span>
                 )}
                 {p.open_tasks > 0 && (
-                  <span className="text-[11px] px-[9px] py-[2px] rounded-full font-medium whitespace-nowrap bg-[rgba(53,224,216,0.14)] text-[var(--accent)]">
+                  <span className="text-[11px] px-[9px] py-[2px] rounded-full font-medium whitespace-nowrap bg-[rgba(45,212,191,0.14)] text-[var(--accent)]">
                     {p.open_tasks} tarefa{p.open_tasks > 1 ? "s" : ""}
                   </span>
                 )}

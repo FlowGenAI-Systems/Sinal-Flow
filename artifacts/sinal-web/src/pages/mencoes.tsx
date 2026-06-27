@@ -67,7 +67,7 @@ export default function Mencoes() {
               let bgClass = "bg-[var(--surface-3)]";
               
               if (typeLower === 'elogio') { typeClass = "text-[var(--ok)]"; bgClass = "bg-[rgba(74,222,128,0.12)]"; }
-              else if (typeLower === 'critica') { typeClass = "text-[var(--danger)]"; bgClass = "bg-[rgba(248,113,113,0.14)]"; }
+              else if (typeLower === 'critica') { typeClass = "text-[var(--danger)]"; bgClass = "bg-[rgba(239,68,68,0.14)]"; }
               else if (typeLower === 'objecao') { typeClass = "text-[var(--warn)]"; bgClass = "bg-[rgba(251,191,36,0.13)]"; }
               else if (typeLower === 'recomendacao') { typeClass = "text-[var(--accent)]"; bgClass = "bg-[var(--accent-glow)]"; }
 
@@ -83,7 +83,7 @@ export default function Mencoes() {
                       <span className="bg-[var(--surface-3)] text-[var(--muted)] px-[7px] py-[1px] rounded-[5px]">De: {m.sender_name || "Desconhecido"}</span>
                     </div>
                   </div>
-                  <button className="text-[11px] font-sans font-semibold text-[var(--accent)] bg-[var(--accent-glow)] border-none px-[10px] py-[4px] rounded-[7px] cursor-pointer inline-flex items-center gap-[5px] transition-[0.14s] whitespace-nowrap hover:bg-[rgba(53,224,216,0.22)]"><Bookmark className="w-3 h-3" /> salvar</button>
+                  <button className="text-[11px] font-sans font-semibold text-[var(--accent)] bg-[var(--accent-glow)] border-none px-[10px] py-[4px] rounded-[7px] cursor-pointer inline-flex items-center gap-[5px] transition-[0.14s] whitespace-nowrap hover:bg-[rgba(45,212,191,0.22)]"><Bookmark className="w-3 h-3" /> salvar</button>
                 </div>
               );
             })}

@@ -91,9 +91,9 @@ function dueIndicator(
 }
 
 const DUE_TONE_CLASS: Record<DueTone, string> = {
-  overdue: "bg-[rgba(248,113,113,0.13)] text-[var(--danger)]",
+  overdue: "bg-[rgba(239,68,68,0.13)] text-[var(--danger)]",
   today: "bg-[rgba(245,158,11,0.14)] text-[var(--warn)]",
-  soon: "bg-[rgba(53,224,216,0.12)] text-[var(--accent)]",
+  soon: "bg-[rgba(45,212,191,0.12)] text-[var(--accent)]",
   later: "bg-[var(--surface-3)] text-[var(--muted-2)]",
 };
 
@@ -182,7 +182,7 @@ function InviteCard({
               className={`text-[10px] font-mono px-[6px] py-[1px] rounded-[5px] inline-flex items-center gap-[3px] ${
                 isSent
                   ? "bg-[rgba(96,165,250,0.13)] text-[var(--info)]"
-                  : "bg-[rgba(53,224,216,0.12)] text-[var(--accent)]"
+                  : "bg-[rgba(45,212,191,0.12)] text-[var(--accent)]"
               }`}
             >
               {isSent ? (
@@ -639,7 +639,7 @@ export default function Salvos() {
                     clearCompleted.mutate();
                   }}
                   disabled={clearCompleted.isPending}
-                  className="inline-flex items-center gap-[5px] text-[11px] font-medium text-[var(--muted-2)] bg-[var(--surface-3)] border border-[var(--border-soft)] rounded-[6px] px-[9px] py-[4px] cursor-pointer transition-[0.14s] hover:text-[var(--danger,#f87171)] hover:bg-[var(--surface-2)] disabled:opacity-50 shrink-0"
+                  className="inline-flex items-center gap-[5px] text-[11px] font-medium text-[var(--muted-2)] bg-[var(--surface-3)] border border-[var(--border-soft)] rounded-[6px] px-[9px] py-[4px] cursor-pointer transition-[0.14s] hover:text-[var(--danger,#EF4444)] hover:bg-[var(--surface-2)] disabled:opacity-50 shrink-0"
                 >
                   {clearCompleted.isPending ? (
                     <Loader2 className="w-3 h-3 animate-spin" />
@@ -675,7 +675,7 @@ export default function Salvos() {
                   <div className="flex-1">
                     <div className={`text-[13.5px] font-medium leading-[1.4] ${task.done ? 'line-through text-[var(--muted-2)]' : ''}`}>
                       {task.title}
-                      {task.direction === 'mine' && <span className="text-[10.5px] font-mono px-[7px] py-[1px] rounded-[5px] ml-[4px] whitespace-nowrap bg-[rgba(53,224,216,0.12)] text-[var(--accent)]">mine</span>}
+                      {task.direction === 'mine' && <span className="text-[10.5px] font-mono px-[7px] py-[1px] rounded-[5px] ml-[4px] whitespace-nowrap bg-[rgba(45,212,191,0.12)] text-[var(--accent)]">mine</span>}
                       {task.direction === 'theirs' && <span className="text-[10.5px] font-mono px-[7px] py-[1px] rounded-[5px] ml-[4px] whitespace-nowrap bg-[rgba(96,165,250,0.13)] text-[var(--info)]">theirs</span>}
                     </div>
                     {task.note && (
@@ -696,7 +696,7 @@ export default function Salvos() {
                       deleteTask.mutate(task.id);
                     }}
                     disabled={deleteTask.isPending}
-                    className="shrink-0 mt-[1px] p-[3px] rounded-[6px] text-[var(--muted-2)] opacity-0 group-hover:opacity-100 transition-[0.15s] hover:text-[var(--danger,#f87171)] hover:bg-[var(--surface-3)] disabled:opacity-50"
+                    className="shrink-0 mt-[1px] p-[3px] rounded-[6px] text-[var(--muted-2)] opacity-0 group-hover:opacity-100 transition-[0.15s] hover:text-[var(--danger,#EF4444)] hover:bg-[var(--surface-3)] disabled:opacity-50"
                   >
                     <Trash2 className="w-[15px] h-[15px]" />
                   </button>

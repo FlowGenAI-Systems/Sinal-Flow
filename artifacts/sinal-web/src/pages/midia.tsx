@@ -39,11 +39,11 @@ import {
 } from "recharts";
 
 const COLUMNS = [
-  { key: "audio", label: "Áudios", icon: Mic, color: "#35E0D8", types: ["AudioMessage"] },
+  { key: "audio", label: "Áudios", icon: Mic, color: "#2DD4BF", types: ["AudioMessage"] },
   { key: "image", label: "Imagens", icon: ImageIcon, color: "#60A5FA", types: ["ImageMessage"] },
-  { key: "document", label: "Docs", icon: FileText, color: "#FBBF24", types: ["DocumentMessage"] },
+  { key: "document", label: "Docs", icon: FileText, color: "#F59E0B", types: ["DocumentMessage"] },
   { key: "sticker", label: "Figurinhas", icon: Sticker, color: "#C084FC", types: ["StickerMessage"] },
-  { key: "video", label: "Vídeos", icon: Video, color: "#F87171", types: ["VideoMessage", "PtvMessage"] },
+  { key: "video", label: "Vídeos", icon: Video, color: "#EF4444", types: ["VideoMessage", "PtvMessage"] },
 ] as const;
 
 type ColKey = (typeof COLUMNS)[number]["key"];
@@ -169,7 +169,7 @@ function MediaDrillSheet({ drill, onClose }: { drill: Drill | null; onClose: () 
                       className={`w-[30px] h-[30px] rounded-[8px] flex items-center justify-center shrink-0 ${
                         m.direction === "inbound"
                           ? "bg-[var(--surface-3)] text-[var(--info)]"
-                          : "bg-[rgba(53,224,216,0.1)] text-[var(--accent)]"
+                          : "bg-[rgba(45,212,191,0.1)] text-[var(--accent)]"
                       }`}
                     >
                       <Icon className="w-4 h-4" />

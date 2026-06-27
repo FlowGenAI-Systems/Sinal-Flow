@@ -53,7 +53,7 @@ export default function Grupos() {
               <span className="text-[10.5px] text-[var(--muted)] bg-[var(--surface-3)] px-[7px] py-[2px] rounded-[6px] font-mono">{topic.person_count ?? 0} pessoas</span>
               <span className="text-[var(--ok)] font-mono inline-flex items-center gap-[4px]"><TrendingUp className="w-3 h-3" /> {topic.message_count} msgs</span>
             </div>
-            <button onClick={(e) => e.stopPropagation()} className="text-[11px] font-sans font-semibold text-[var(--accent)] bg-[var(--accent-glow)] border-none px-[10px] py-[4px] rounded-[7px] cursor-pointer inline-flex items-center gap-[5px] transition-[0.14s] whitespace-nowrap mt-[12px] ml-[6px] hover:bg-[rgba(53,224,216,0.22)]"><Bookmark className="w-3 h-3" /> salvar</button>
+            <button onClick={(e) => e.stopPropagation()} className="text-[11px] font-sans font-semibold text-[var(--accent)] bg-[var(--accent-glow)] border-none px-[10px] py-[4px] rounded-[7px] cursor-pointer inline-flex items-center gap-[5px] transition-[0.14s] whitespace-nowrap mt-[12px] ml-[6px] hover:bg-[rgba(45,212,191,0.22)]"><Bookmark className="w-3 h-3" /> salvar</button>
           </div>
         ))}
         {!topics?.length && <div className="col-span-3 py-8 text-center text-[var(--muted-2)] text-[13px]">Nenhuma pauta cruzada detectada.</div>}
