@@ -3,6 +3,7 @@ import { useLogin } from "@/lib/api";
 import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { FlowgenIcon } from "@/components/FlowgenLogo";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -21,9 +22,7 @@ export default function Login() {
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[var(--accent)] rounded-full blur-[120px] opacity-[0.03] pointer-events-none" />
       
       <div className="w-full max-w-sm flex flex-col items-center z-10">
-        <div className="w-14 h-14 rounded-xl bg-[radial-gradient(120%_120%_at_30%_20%,var(--accent),var(--accent-dim))] flex items-center justify-center shadow-[0_0_0_1px_rgba(45,212,191,0.3),0_12px_24px_var(--accent-glow)] mb-8">
-          <svg viewBox="0 0 64 64" fill="none" className="w-7 h-7"><path d="M20 46V18H44V28H30V46" stroke="#06201e" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="20" cy="18" r="4.5" fill="#06201e"/><circle cx="44" cy="28" r="4.5" fill="#06201e"/><circle cx="30" cy="46" r="4.5" fill="#06201e"/></svg>
-        </div>
+        <div className="mb-8"><FlowgenIcon size={56} /></div>
         
         <h1 className="font-display font-semibold text-3xl tracking-wide mb-2 text-white">Bem-vindo ao SinalFlow</h1>
         <p className="text-[var(--muted)] text-sm font-mono mb-8">WhatsApp Intelligence + CRM</p>

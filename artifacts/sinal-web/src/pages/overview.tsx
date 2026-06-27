@@ -203,7 +203,7 @@ function HardCard({
           {icon} {label}
         </span>
       </div>
-      <div className="font-display font-semibold text-[34px] leading-none tracking-[-0.01em]">
+      <div className="font-mono font-semibold text-[34px] leading-none tracking-[-0.01em]">
         {value.toLocaleString("pt-BR")}
       </div>
       <div className="mt-[9px] text-[12px] text-[var(--muted)]">{hint}</div>

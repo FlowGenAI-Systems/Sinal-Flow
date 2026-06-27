@@ -19,8 +19,8 @@
   --color-popover-foreground: var(--text);
   --color-popover-border: var(--border-soft);
 
-  --color-primary: var(--accent);
-  --color-primary-foreground: #06201e;
+  --color-primary: var(--accent-dim);
+  --color-primary-foreground: #FFFFFF;
 
   --color-secondary: var(--surface-2);
   --color-secondary-foreground: var(--text);
@@ -70,5 +70,8 @@
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
+  }
+  .font-mono {
+    font-variant-numeric: tabular-nums;
   }
 }

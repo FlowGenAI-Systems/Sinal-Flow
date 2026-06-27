@@ -4,6 +4,7 @@ import { useLogout, useMe } from "@/lib/api";
 import { useTimeWindow, TIME_WINDOWS } from "@/lib/timeWindow";
 import CommandPalette from "@/components/CommandPalette";
 import RefreshControl from "@/components/RefreshControl";
+import { FlowgenIcon } from "@/components/FlowgenLogo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -65,12 +66,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
       {/* Sidebar */}
       <aside className="bg-[var(--surface)] border-r border-[var(--border-soft)] flex flex-col p-[18px_14px] gap-[4px] h-screen">
         <div className="flex items-center gap-[10px] p-[6px_8px_18px]">
-          <div className="w-[32px] h-[32px] rounded-[10px] bg-[radial-gradient(120%_120%_at_30%_20%,var(--accent),var(--accent-dim))] flex items-center justify-center shadow-[0_0_0_1px_rgba(45,212,191,0.3),0_6px_18px_var(--accent-glow)]">
-            <svg viewBox="0 0 64 64" fill="none" className="w-[18px] h-[18px]"><path d="M20 46V18H44V28H30V46" stroke="#06201e" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="20" cy="18" r="4.5" fill="#06201e"/><circle cx="44" cy="28" r="4.5" fill="#06201e"/><circle cx="30" cy="46" r="4.5" fill="#06201e"/></svg>
-          </div>
+          <FlowgenIcon size={34} />
           <div>
             <div className="font-display font-bold text-[19px] tracking-[0.01em] leading-none">SinalFlow</div>
-            <div className="text-[10.5px] text-[var(--muted-2)] tracking-[0.05em] mt-[2px]">sinal &gt; ruído</div>
+            <div className="font-mono text-[10.5px] text-[var(--muted-2)] tracking-[0.05em] mt-[2px]">sinal &gt; ruído</div>
           </div>
         </div>
 
@@ -132,7 +131,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
       {/* Main Content */}
       <main className="h-screen overflow-y-auto relative flex flex-col">
-        <div className="sticky top-0 z-20 backdrop-blur-[12px] bg-[rgba(11,17,32,0.72)] border-b border-[var(--border-soft)] flex items-center gap-[16px] p-[14px_26px]">
+        <div className="sticky top-0 z-20 bg-[var(--bg)] border-b border-[var(--border-soft)] flex items-center gap-[16px] p-[14px_26px]">
           <h1 className="font-display font-semibold text-[21px] tracking-[0.005em]">
             {[...navItems, ...relItems].find(i => i.href === location)?.label || "SinalFlow"}
           </h1>

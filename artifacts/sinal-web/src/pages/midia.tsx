@@ -388,7 +388,7 @@ export default function Midia() {
             <Layers className="w-4 h-4 text-[var(--accent)]" />
             <span className="text-[11px] uppercase tracking-[0.08em] font-semibold">Total</span>
           </div>
-          <div className="font-display text-[27px] font-semibold text-[var(--text)] mt-[4px]">
+          <div className="font-mono text-[27px] font-semibold text-[var(--text)] mt-[4px]">
             {nf(summary?.total ?? 0)}
           </div>
         </button>
@@ -410,7 +410,7 @@ export default function Midia() {
                 <c.icon className="w-4 h-4" style={{ color: c.color }} />
                 <span className="text-[11px] uppercase tracking-[0.08em] font-semibold">{c.label}</span>
               </div>
-              <div className="font-display text-[27px] font-semibold text-[var(--text)] mt-[4px]">
+              <div className="font-mono text-[27px] font-semibold text-[var(--text)] mt-[4px]">
                 {nf(total)}
               </div>
             </button>

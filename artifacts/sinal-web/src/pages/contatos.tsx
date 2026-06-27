@@ -1101,7 +1101,7 @@ export default function Contatos() {
 
       {selectedContact && (
         <div
-          className="fixed inset-0 bg-[rgba(5,5,8,0.6)] backdrop-blur-[2px] z-40 transition-[0.2s]"
+          className="fixed inset-0 bg-[rgba(5,5,8,0.66)] z-40 transition-[0.2s]"
           onClick={() => setSelectedContact(null)}
         />
       )}

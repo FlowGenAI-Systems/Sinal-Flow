@@ -577,7 +577,7 @@ export default function Privado() {
           </div>
           <div className="flex items-end justify-between gap-[10px]">
             <div className="shrink-0">
-              <div className="font-display font-semibold text-[27px] leading-none">
+              <div className="font-mono font-semibold text-[27px] leading-none">
                 {volume?.avgPerDay ?? 0}
                 <small className="text-[13px] text-[var(--muted)] ml-1">
                   /dia
@@ -616,7 +616,7 @@ export default function Privado() {
             <Timer className="w-3.5 h-3.5 text-[var(--info)]" /> Tempo médio de
             resposta
           </div>
-          <div className="font-display font-semibold text-[27px] leading-none">
+          <div className="font-mono font-semibold text-[27px] leading-none">
             {formatMinutes(responseTime?.avg_minutes ?? null)}
           </div>
           <div className="text-[11px] text-[var(--muted-2)] mt-[7px]">
@@ -636,7 +636,7 @@ export default function Privado() {
           <div className="text-[11.5px] text-[var(--muted)] mb-[9px] flex items-center gap-[6px]">
             <Mic className="w-3.5 h-3.5 text-[var(--warn)]" /> Convites em aberto
           </div>
-          <div className="font-display font-semibold text-[27px] leading-none">
+          <div className="font-mono font-semibold text-[27px] leading-none">
             {openReceived.length}
           </div>
           <div className="text-[11px] text-[var(--muted-2)] mt-[7px]">
@@ -649,7 +649,7 @@ export default function Privado() {
             <ListChecks className="w-3.5 h-3.5 text-[var(--accent)]" /> Pendências
             de mim
           </div>
-          <div className="font-display font-semibold text-[27px] leading-none">
+          <div className="font-mono font-semibold text-[27px] leading-none">
             {minePending}
           </div>
           <div className="text-[11px] text-[var(--muted-2)] mt-[7px]">
