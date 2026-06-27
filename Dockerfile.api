@@ -1,23 +1,18 @@
 # Sinal — Serviço de API (servidor Express)
-# Builda o monorepo pnpm e roda o servidor compilado.
 FROM node:24
 WORKDIR /app
 
-# Habilita o pnpm (gerenciador exigido pelo projeto)
-RUN corepack enable
+# Fixa o pnpm na 10.4.1 (a 11.x quebra o build do esbuild)
+RUN corepack enable && corepack prepare pnpm@10.4.1 --activate
 
-# Copia o repositório inteiro (monorepo: o servidor depende de pacotes irmãos)
 COPY . .
 
-# Instala as dependências travadas pelo lockfile
-RUN pnpm install --frozen-lockfile
+# Sem --frozen-lockfile (o lockfile do repo diverge da config)
+RUN pnpm install
 
-# Compila o servidor -> artifacts/api-server/dist/index.mjs
 RUN NODE_ENV=production pnpm --filter @workspace/api-server run build
 
 ENV NODE_ENV=production
 ENV PORT=8080
 EXPOSE 8080
-
-# Sobe o servidor. As chaves (Supabase, OpenAI...) vêm das variáveis do EasyPanel.
 CMD ["node", "--enable-source-maps", "artifacts/api-server/dist/index.mjs"]
