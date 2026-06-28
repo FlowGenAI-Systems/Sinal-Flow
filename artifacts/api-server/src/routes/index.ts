@@ -14,13 +14,13 @@ import googleRouter from "./google";
 import searchRouter from "./search";
 import refreshRouter from "./refresh";
 import sellersRouter from "./sellers";
+
 const router: IRouter = Router();
 
 router.use(healthRouter);
 router.use(authRouter);
 // Mounted before the authed routers: its public OAuth callback must be reachable
-// without a session. Each authed router calls requireAuth with no path, so the
-// first one (metrics) would otherwise 401 every unauthenticated request.
+// without a session.
 router.use(googleRouter);
 router.use(metricsRouter);
 router.use(topicsRouter);
