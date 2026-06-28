@@ -6,7 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useMe } from "@/lib/api";
 import { TimeWindowProvider } from "@/lib/timeWindow";
 import { Loader2 } from "lucide-react";
-
 import AppShell from "@/components/layout/AppShell";
 import Login from "@/pages/login";
 import Overview from "@/pages/overview";
@@ -17,14 +16,12 @@ import Mencoes from "@/pages/mencoes";
 import Contatos from "@/pages/contatos";
 import Conectores from "@/pages/conectores";
 import Salvos from "@/pages/salvos";
+import Vendedores from "@/pages/vendedores";
 import NotFound from "@/pages/not-found";
-
 const queryClient = new QueryClient();
-
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { data, isLoading, error } = useMe();
   const [, setLocation] = useLocation();
-
   if (isLoading) {
     return (
       <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[var(--bg)] text-[var(--text)]">
@@ -36,14 +33,11 @@ function AuthGate({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-
   if (error || !data?.user) {
     return <Login />;
   }
-
   return <>{children}</>;
 }
-
 function Router() {
   return (
     <Switch>
@@ -55,11 +49,11 @@ function Router() {
       <Route path="/contatos" component={Contatos} />
       <Route path="/conectores" component={Conectores} />
       <Route path="/salvos" component={Salvos} />
+      <Route path="/vendedores" component={Vendedores} />
       <Route component={NotFound} />
     </Switch>
   );
 }
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -78,5 +72,4 @@ function App() {
     </QueryClientProvider>
   );
 }
-
 export default App;
