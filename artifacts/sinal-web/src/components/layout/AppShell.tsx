@@ -29,6 +29,9 @@ const navItems = [
   { href: "/mencoes", label: "Menções", icon: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 11a9 9 0 0 1 18 0c0 5-4 6-4 6l-1 3-3-2a9 9 0 0 1-10-7Z" strokeLinecap="round" strokeLinejoin="round"/><path d="M8 11h.01M12 11h.01M16 11h.01" strokeLinecap="round"/></svg>
   ) },
+  { href: "/vendedores", label: "Vendedores", icon: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3v18h18" strokeLinecap="round" strokeLinejoin="round"/><rect x="7" y="12" width="3" height="5" rx="0.5"/><rect x="12" y="8" width="3" height="9" rx="0.5"/><rect x="17" y="5" width="3" height="12" rx="0.5"/></svg>
+  ) },
 ];
 
 const relItems = [
