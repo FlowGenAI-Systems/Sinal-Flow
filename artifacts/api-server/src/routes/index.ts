@@ -13,7 +13,7 @@ import mediaRouter from "./media";
 import googleRouter from "./google";
 import searchRouter from "./search";
 import refreshRouter from "./refresh";
-
+import sellersRouter from "./sellers";
 const router: IRouter = Router();
 
 router.use(healthRouter);
@@ -33,5 +33,6 @@ router.use(entitiesRouter);
 router.use(mediaRouter);
 router.use(searchRouter);
 router.use(refreshRouter);
+router.use(sellersRouter);
 
 export default router;
