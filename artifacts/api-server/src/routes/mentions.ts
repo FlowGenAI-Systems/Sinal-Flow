@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { pool } from "@workspace/db";
 import { requireAuth, type AuthedRequest } from "../lib/auth";
-import { OWNER, excludeSupportGroupsSql } from "../lib/scope";
+import { getOwners, excludeSupportGroupsSql } from "../lib/scope";
 
 const router: IRouter = Router();
 router.use(requireAuth);
@@ -27,7 +27,7 @@ router.get("/mentions", async (req: AuthedRequest, res) => {
     params.push(type);
     where += ` and mn.mention_type = $${params.length}`;
   }
-  const ownerIdx = params.push(OWNER);
+  const ownerIdx = params.push(getOwners());
   const supportClause = includeSupport
     ? ""
     : excludeSupportGroupsSql("m", t, params);
@@ -40,7 +40,7 @@ router.get("/mentions", async (req: AuthedRequest, res) => {
        from mentions mn
        left join monitored_entities e on e.id = mn.entity_id
        left join whatsapp_messages m on m.message_id = mn.message_id
-            and m.whatsapp_owner = $${ownerIdx}
+            and m.whatsapp_owner = any($${ownerIdx})
        ${where}${supportClause}
        order by m.message_created_at desc nulls last
        limit 200`,
@@ -48,7 +48,7 @@ router.get("/mentions", async (req: AuthedRequest, res) => {
   );
 
   const kpiParams: unknown[] = [t];
-  const kpiOwnerIdx = kpiParams.push(OWNER);
+  const kpiOwnerIdx = kpiParams.push(getOwners());
   const kpiSupportClause = includeSupport
     ? ""
     : excludeSupportGroupsSql("m", t, kpiParams);
@@ -56,7 +56,7 @@ router.get("/mentions", async (req: AuthedRequest, res) => {
     `select mn.mention_type, count(*)::int as count
        from mentions mn
        left join whatsapp_messages m on m.message_id = mn.message_id
-            and m.whatsapp_owner = $${kpiOwnerIdx}
+            and m.whatsapp_owner = any($${kpiOwnerIdx})
       where mn.tenant_id = $1${kpiSupportClause}
       group by mn.mention_type`,
     kpiParams,

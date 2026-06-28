@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useMe } from "@/lib/api";
 import { TimeWindowProvider } from "@/lib/timeWindow";
+import { AccountProvider } from "@/lib/accountFilter";
 import { Loader2 } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
 import Login from "@/pages/login";
@@ -14,6 +15,7 @@ import Grupos from "@/pages/grupos";
 import Midia from "@/pages/midia";
 import Mencoes from "@/pages/mencoes";
 import Contatos from "@/pages/contatos";
+import Usuarios from "@/pages/usuarios";
 import Conectores from "@/pages/conectores";
 import Salvos from "@/pages/salvos";
 import Vendedores from "@/pages/vendedores";
@@ -47,6 +49,7 @@ function Router() {
       <Route path="/midia" component={Midia} />
       <Route path="/mencoes" component={Mencoes} />
       <Route path="/contatos" component={Contatos} />
+      <Route path="/usuarios" component={Usuarios} />
       <Route path="/conectores" component={Conectores} />
       <Route path="/salvos" component={Salvos} />
       <Route path="/vendedores" component={Vendedores} />
@@ -61,9 +64,11 @@ function App() {
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
           <TimeWindowProvider>
             <AuthGate>
-              <AppShell>
-                <Router />
-              </AppShell>
+              <AccountProvider>
+                <AppShell>
+                  <Router />
+                </AppShell>
+              </AccountProvider>
             </AuthGate>
           </TimeWindowProvider>
         </WouterRouter>

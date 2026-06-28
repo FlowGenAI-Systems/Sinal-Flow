@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { pool } from "@workspace/db";
-import { OWNER, requireOwnerTenant } from "../lib/scope";
+import { getOwners, requireOwnerTenant } from "../lib/scope";
 import { requireAuth, type AuthedRequest } from "../lib/auth";
 
 const router: IRouter = Router();
@@ -62,11 +62,11 @@ router.get("/media/messages", async (req: AuthedRequest, res) => {
   const offset = Number.isFinite(offsetRaw) && offsetRaw > 0 ? Math.floor(offsetRaw) : 0;
 
   const where = [
-    "whatsapp_owner = $1",
+    "whatsapp_owner = any($1)",
     "media_url is not null",
     "metadata->>'raw_type' is not null",
   ];
-  const params: unknown[] = [OWNER];
+  const params: unknown[] = [getOwners()];
 
   const type = typeof req.query.type === "string" ? req.query.type : undefined;
   if (type && TYPE_RAW[type]) {
@@ -126,11 +126,11 @@ router.get("/media/summary", async (_req: AuthedRequest, res) => {
             count(*) filter (where chat_type = 'group')::int as group_count,
             count(*) filter (where chat_type = 'private')::int as private_count
        from whatsapp_messages
-      where whatsapp_owner = $1 and media_url is not null
+      where whatsapp_owner = any($1) and media_url is not null
         and metadata->>'raw_type' is not null
       group by 1
       order by total desc`,
-    [OWNER],
+    [getOwners()],
   );
   const total = rows.reduce((acc, r) => acc + Number(r.total), 0);
   res.json({ total, byType: rows });
@@ -150,14 +150,14 @@ router.get("/media/by-contact", async (req: AuthedRequest, res) => {
             ${TYPE_COUNTS},
             max(message_created_at) as last_at
        from whatsapp_messages
-      where whatsapp_owner = $1 and chat_type = 'private'
+      where whatsapp_owner = any($1) and chat_type = 'private'
         and media_url is not null
         and coalesce(nullif(chat_id,''), nullif(contact_phone,'')) is not null
         and metadata->>'raw_type' is not null
       group by coalesce(nullif(chat_id,''), nullif(contact_phone,''))
       order by total desc
       limit $2`,
-    [OWNER, limit],
+    [getOwners(), limit],
   );
   res.json({ contacts: rows });
 });
@@ -172,13 +172,13 @@ router.get("/media/by-group", async (req: AuthedRequest, res) => {
             ${TYPE_COUNTS},
             max(message_created_at) as last_at
        from whatsapp_messages
-      where whatsapp_owner = $1 and chat_type = 'group'
+      where whatsapp_owner = any($1) and chat_type = 'group'
         and media_url is not null and chat_id is not null
         and metadata->>'raw_type' is not null
       group by chat_id
       order by total desc
       limit $2`,
-    [OWNER, limit],
+    [getOwners(), limit],
   );
   res.json({ groups: rows });
 });
@@ -192,12 +192,12 @@ router.get("/media/timeseries", async (req: AuthedRequest, res) => {
             count(*)::int as total,
             ${TYPE_COUNTS}
        from whatsapp_messages
-      where whatsapp_owner = $1 and media_url is not null
+      where whatsapp_owner = any($1) and media_url is not null
         and metadata->>'raw_type' is not null
         and message_created_at is not null
       group by 1
       order by 1`,
-    [OWNER, granularity],
+    [getOwners(), granularity],
   );
   res.json({ granularity, points: rows });
 });
@@ -214,18 +214,18 @@ router.get("/media/stats", async (_req: AuthedRequest, res) => {
               count(*) filter (where chat_type = 'group')::int as group_count,
               count(*) filter (where chat_type = 'private')::int as private_count
          from whatsapp_messages
-        where whatsapp_owner = $1 and media_url is not null
+        where whatsapp_owner = any($1) and media_url is not null
           and metadata->>'raw_type' is not null
         group by 1`,
-      [OWNER],
+      [getOwners()],
     ),
     pool.query(
       `select min(message_created_at) as min_at,
               max(message_created_at) as max_at
          from whatsapp_messages
-        where whatsapp_owner = $1 and media_url is not null
+        where whatsapp_owner = any($1) and media_url is not null
           and metadata->>'raw_type' is not null`,
-      [OWNER],
+      [getOwners()],
     ),
   ]);
   res.json({

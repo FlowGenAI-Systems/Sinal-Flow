@@ -2,7 +2,7 @@ import { Router, type IRouter } from "express";
 import { z } from "zod/v4";
 import { pool } from "@workspace/db";
 import { TOPIC_BLACKLIST, GROUP_TOPIC_BLACKLIST } from "@workspace/ai";
-import { OWNER, requireOwnerTenant } from "../lib/scope";
+import { getOwners, requireOwnerTenant } from "../lib/scope";
 import { requireAuth, type AuthedRequest } from "../lib/auth";
 
 const router: IRouter = Router();
@@ -45,11 +45,11 @@ router.get("/metrics/private/categories", async (req: AuthedRequest, res) => {
     `select coalesce(e.category,'(sem)') as category, count(*)::int as count
        from message_enrichment e
        join whatsapp_messages m on m.message_id = e.message_id
-        and m.whatsapp_owner = $2
+        and m.whatsapp_owner = any($2)
       where e.tenant_id = $1 and e.chat_type = 'private'
         and m.message_created_at >= now() - ($3 || ' days')::interval
       group by e.category order by count desc`,
-    [tenant(req), OWNER, String(days)],
+    [tenant(req), getOwners(), String(days)],
   );
   res.json({ categories: rows });
 });
@@ -74,10 +74,10 @@ router.get("/metrics/private/volume", async (req: AuthedRequest, res) => {
             count(*) filter (where direction = 'inbound')::int as received,
             count(*) filter (where direction = 'outbound')::int as sent
        from whatsapp_messages
-      where whatsapp_owner = $1 and chat_type = 'private'
+      where whatsapp_owner = any($1) and chat_type = 'private'
         and message_created_at >= now() - ($2 || ' days')::interval
       group by 1 order by 1`,
-    [OWNER, String(days)],
+    [getOwners(), String(days)],
   );
   res.json({ volume: rows });
 });
@@ -96,12 +96,12 @@ router.get("/metrics/private/top-contacts", async (req: AuthedRequest, res) => {
             count(*) filter (where direction = 'outbound')::int as sent,
             max(message_created_at) as last_at
        from whatsapp_messages
-      where whatsapp_owner = $1 and chat_type = 'private'
+      where whatsapp_owner = any($1) and chat_type = 'private'
         and coalesce(nullif(chat_id,''), nullif(contact_phone,'')) is not null
       group by 1
       order by messages desc
       limit $2`,
-    [OWNER, limit],
+    [getOwners(), limit],
   );
   res.json({ contacts: rows });
 });
@@ -136,7 +136,7 @@ router.get("/metrics/private/unanswered", async (req: AuthedRequest, res) => {
               message_id, message_created_at, direction, chat_name, sender_name,
               message, caption, transcription
          from whatsapp_messages
-        where whatsapp_owner = $1 and chat_type = 'private'
+        where whatsapp_owner = any($1) and chat_type = 'private'
           and coalesce(nullif(chat_id,''), nullif(contact_phone,'')) is not null
      ),
      last_msg as (
@@ -155,7 +155,7 @@ router.get("/metrics/private/unanswered", async (req: AuthedRequest, res) => {
         and e.requires_reply is true
       order by l.message_created_at desc
       limit $2`,
-    [OWNER, limit],
+    [getOwners(), limit],
   );
   res.json({ unanswered: rows });
 });
@@ -180,7 +180,7 @@ router.get("/metrics/private/invites", async (req: AuthedRequest, res) => {
               coalesce(nullif(m.message,''), m.caption, m.transcription) as text
          from message_enrichment e
          join whatsapp_messages m on m.message_id = e.message_id
-          and m.whatsapp_owner = $2
+          and m.whatsapp_owner = any($2)
         where e.tenant_id = $1 and e.chat_type = 'private'
           and e.category in ('convite','oportunidade/parceria')
           and coalesce(nullif(m.chat_id,''), nullif(m.contact_phone,'')) is not null
@@ -203,7 +203,7 @@ router.get("/metrics/private/invites", async (req: AuthedRequest, res) => {
          on t.tenant_id = $1 and t.chat_id = i.phone
       where i.rn = 1
       order by i.at desc`,
-    [tenant(req), OWNER, String(days)],
+    [tenant(req), getOwners(), String(days)],
   );
   res.json({ invites: rows });
 });
@@ -343,7 +343,7 @@ router.get("/metrics/private/response-time", async (req: AuthedRequest, res) => 
        select coalesce(nullif(chat_id,''), nullif(contact_phone,'')) as chat_id,
               message_created_at, direction
          from whatsapp_messages
-        where whatsapp_owner = $1 and chat_type = 'private'
+        where whatsapp_owner = any($1) and chat_type = 'private'
           and coalesce(nullif(chat_id,''), nullif(contact_phone,'')) is not null
           and message_created_at >= now() - ($2 || ' days')::interval
      ),
@@ -385,7 +385,7 @@ router.get("/metrics/private/response-time", async (req: AuthedRequest, res) => 
             round(percentile_cont(0.5) within group (order by mins))::int as median_minutes,
             count(*)::int as sample
        from latencies`,
-    [OWNER, String(days), WORK_TZ, WORK_START_HOUR, WORK_END_HOUR],
+    [getOwners(), String(days), WORK_TZ, WORK_START_HOUR, WORK_END_HOUR],
   );
   const r = rows[0] ?? {};
   res.json({
@@ -416,18 +416,18 @@ router.get("/metrics/private/volume-summary", async (req: AuthedRequest, res) =>
              and message_created_at < now() - ($2 || ' days')::interval
          )::int as previous
        from whatsapp_messages
-      where whatsapp_owner = $1 and chat_type = 'private' and direction = 'inbound'
+      where whatsapp_owner = any($1) and chat_type = 'private' and direction = 'inbound'
         and message_created_at >= now() - (($2::int * 2) || ' days')::interval`,
-      [OWNER, String(days)],
+      [getOwners(), String(days)],
     ),
     pool.query(
       `select to_char(date_trunc('day', message_created_at), 'YYYY-MM-DD') as day,
               count(*)::int as received
          from whatsapp_messages
-        where whatsapp_owner = $1 and chat_type = 'private' and direction = 'inbound'
+        where whatsapp_owner = any($1) and chat_type = 'private' and direction = 'inbound'
           and message_created_at >= now() - interval '30 days'
         group by 1 order by 1`,
-      [OWNER],
+      [getOwners()],
     ),
   ]);
   const current = compare.rows[0]?.current ?? 0;
@@ -460,7 +460,7 @@ router.get("/metrics/private/intelligence", async (req: AuthedRequest, res) => {
               coalesce(nullif(m.chat_name,''), nullif(m.sender_name,'')) as person
          from message_enrichment e
          join whatsapp_messages m on m.message_id = e.message_id
-          and m.whatsapp_owner = $2
+          and m.whatsapp_owner = any($2)
         where e.tenant_id = $1 and e.chat_type = 'private'
           and e.topics is not null
           and coalesce(nullif(m.chat_id,''), nullif(m.contact_phone,'')) is not null
@@ -471,7 +471,7 @@ router.get("/metrics/private/intelligence", async (req: AuthedRequest, res) => {
          select unnest(e.topics) as topic
            from message_enrichment e
            join whatsapp_messages m on m.message_id = e.message_id
-            and m.whatsapp_owner = $2
+            and m.whatsapp_owner = any($2)
           where e.tenant_id = $1 and e.chat_type = 'private'
             and e.topics is not null
             and m.message_created_at >= now() - (($3::int * 2) || ' days')::interval
@@ -507,7 +507,7 @@ router.get("/metrics/private/intelligence", async (req: AuthedRequest, res) => {
             ), '[]'::json) as people
        from totals t
       order by t.count desc`,
-    [tenant(req), OWNER, String(days), limit, TOPIC_BLACKLIST],
+    [tenant(req), getOwners(), String(days), limit, TOPIC_BLACKLIST],
   );
   res.json({ intelligence: rows });
 });
@@ -527,13 +527,13 @@ router.get("/metrics/private/topic-examples", async (req: AuthedRequest, res) =>
             coalesce(nullif(m.message,''), m.caption, m.transcription) as text
        from message_enrichment e
        join whatsapp_messages m on m.message_id = e.message_id
-        and m.whatsapp_owner = $2
+        and m.whatsapp_owner = any($2)
       where e.tenant_id = $1 and e.chat_type = 'private'
         and e.topics is not null and $3 = any(e.topics)
         and m.message_created_at >= now() - ($4 || ' days')::interval
       order by m.message_created_at desc
       limit $5`,
-    [tenant(req), OWNER, topic, String(days), limit],
+    [tenant(req), getOwners(), topic, String(days), limit],
   );
   res.json({ examples: rows });
 });
@@ -551,7 +551,7 @@ router.get("/metrics/private/pending", async (req: AuthedRequest, res) => {
                 message_id, message_created_at, direction, chat_name, sender_name,
                 message, caption, transcription
            from whatsapp_messages
-          where whatsapp_owner = $1 and chat_type = 'private'
+          where whatsapp_owner = any($1) and chat_type = 'private'
             and coalesce(nullif(chat_id,''), nullif(contact_phone,'')) is not null
             and message_created_at >= now() - ($2 || ' days')::interval
        ),
@@ -575,7 +575,7 @@ router.get("/metrics/private/pending", async (req: AuthedRequest, res) => {
                and (d.snooze_until is null or d.snooze_until > now())
           )
         order by l.message_created_at desc`,
-      [OWNER, String(days), t],
+      [getOwners(), String(days), t],
     ),
     pool.query(
       `select c.id as contact_id, c.primary_phone as phone, c.display_name,
@@ -676,11 +676,11 @@ router.get("/metrics/private/thread", async (req: AuthedRequest, res) => {
     `select message_id, direction, message_created_at,
             coalesce(nullif(message,''), caption, transcription) as text
        from whatsapp_messages
-      where whatsapp_owner = $1 and chat_type = 'private'
+      where whatsapp_owner = any($1) and chat_type = 'private'
         and (chat_id = $2 or nullif(contact_phone,'') = $2)
       order by message_created_at desc
       limit $3`,
-    [OWNER, chatId, limit],
+    [getOwners(), chatId, limit],
   );
   // Return chronological (oldest first) for display.
   res.json({ messages: rows.reverse() });
@@ -744,9 +744,9 @@ router.get("/metrics/overview", async (req: AuthedRequest, res) => {
             and metadata->>'raw_type' = 'AudioMessage'
         )::int as audios
        from whatsapp_messages
-      where whatsapp_owner = $1 and chat_type = 'private'
+      where whatsapp_owner = any($1) and chat_type = 'private'
         and message_created_at >= now() - ($2 || ' days')::interval`,
-    [OWNER, String(days)],
+    [getOwners(), String(days)],
   );
   const r = rows[0] ?? {};
   res.json({
@@ -771,14 +771,14 @@ router.get("/metrics/private/volume-compare", async (req: AuthedRequest, res) =>
      cur as (
        select ((message_created_at at time zone $3)::date) as d, count(*)::int as n
          from whatsapp_messages
-        where whatsapp_owner = $1 and chat_type = 'private' and direction = 'inbound'
+        where whatsapp_owner = any($1) and chat_type = 'private' and direction = 'inbound'
           and message_created_at >= now() - ($2 || ' days')::interval
         group by 1
      ),
      prev as (
        select ((message_created_at at time zone $3)::date) as d, count(*)::int as n
          from whatsapp_messages
-        where whatsapp_owner = $1 and chat_type = 'private' and direction = 'inbound'
+        where whatsapp_owner = any($1) and chat_type = 'private' and direction = 'inbound'
           and message_created_at >= now() - (($2::int * 2) || ' days')::interval
           and message_created_at < now() - ($2 || ' days')::interval
         group by 1
@@ -791,7 +791,7 @@ router.get("/metrics/private/volume-compare", async (req: AuthedRequest, res) =>
        left join cur c on c.d = (now() at time zone $3)::date - ($2::int - 1) + g.off
        left join prev p on p.d = (now() at time zone $3)::date - ($2::int * 2 - 1) + g.off
       order by g.off`,
-    [OWNER, String(days), WORK_TZ],
+    [getOwners(), String(days), WORK_TZ],
   );
   const current = rows.reduce((acc, r) => acc + Number(r.current), 0);
   const previous = rows.reduce((acc, r) => acc + Number(r.previous), 0);
@@ -819,7 +819,7 @@ router.get("/metrics/private/content-ideas", async (req: AuthedRequest, res) => 
               e.is_question
          from message_enrichment e
          join whatsapp_messages m on m.message_id = e.message_id
-          and m.whatsapp_owner = $2
+          and m.whatsapp_owner = any($2)
         where e.tenant_id = $1 and e.chat_type = 'private'
           and m.direction = 'inbound' and e.topics is not null
           and coalesce(nullif(m.chat_id,''), nullif(m.contact_phone,'')) is not null
@@ -834,7 +834,7 @@ router.get("/metrics/private/content-ideas", async (req: AuthedRequest, res) => 
       group by topic
       order by question_count desc, count desc
       limit $4`,
-    [tenant(req), OWNER, String(days), limit, TOPIC_BLACKLIST],
+    [tenant(req), getOwners(), String(days), limit, TOPIC_BLACKLIST],
   );
   res.json({ ideas: rows });
 });
@@ -850,7 +850,7 @@ router.get("/metrics/groups/topics", async (req: AuthedRequest, res) => {
        select trim(unnest(e.topics)) as topic, m.chat_id
          from message_enrichment e
          join whatsapp_messages m on m.message_id = e.message_id
-          and m.whatsapp_owner = $2
+          and m.whatsapp_owner = any($2)
         where e.tenant_id = $1 and e.chat_type = 'group'
           and e.topics is not null
           and m.message_created_at >= now() - ($3 || ' days')::interval
@@ -881,7 +881,7 @@ router.get("/metrics/groups/topics", async (req: AuthedRequest, res) => {
       group by l.label
       order by count desc
       limit $4`,
-    [tenant(req), OWNER, String(days), limit, GROUP_TOPIC_BLACKLIST],
+    [tenant(req), getOwners(), String(days), limit, GROUP_TOPIC_BLACKLIST],
   );
   res.json({ topics: rows });
 });
@@ -904,7 +904,7 @@ router.get("/metrics/groups/topic-examples", async (req: AuthedRequest, res) => 
             coalesce(nullif(m.message,''), m.caption, m.transcription) as text
        from message_enrichment e
        join whatsapp_messages m on m.message_id = e.message_id
-        and m.whatsapp_owner = $2
+        and m.whatsapp_owner = any($2)
       where e.tenant_id = $1 and e.chat_type = 'group'
         and e.topics is not null
         and exists (
@@ -918,7 +918,7 @@ router.get("/metrics/groups/topic-examples", async (req: AuthedRequest, res) => 
         )
       order by m.message_created_at desc
       limit $5`,
-    [tenant(req), OWNER, topic, String(days), limit],
+    [tenant(req), getOwners(), topic, String(days), limit],
   );
   // Which groups this topic circulates in (name + message count), so the
   // drawer can route the user straight to the right group digest.
@@ -928,7 +928,7 @@ router.get("/metrics/groups/topic-examples", async (req: AuthedRequest, res) => 
             count(*)::int as message_count
        from message_enrichment e
        join whatsapp_messages m on m.message_id = e.message_id
-        and m.whatsapp_owner = $2
+        and m.whatsapp_owner = any($2)
       where e.tenant_id = $1 and e.chat_type = 'group'
         and e.topics is not null
         and exists (
@@ -942,7 +942,7 @@ router.get("/metrics/groups/topic-examples", async (req: AuthedRequest, res) => 
         )
       group by m.chat_id
       order by message_count desc`,
-    [tenant(req), OWNER, topic, String(days)],
+    [tenant(req), getOwners(), topic, String(days)],
   );
   res.json({ examples: rows, groups });
 });

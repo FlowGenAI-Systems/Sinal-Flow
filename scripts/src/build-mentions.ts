@@ -1,4 +1,4 @@
-import { pool } from "@workspace/db";
+import { pool, getActiveOwnerPhones } from "@workspace/db";
 import { classifyMentions, type MentionInput } from "@workspace/ai";
 
 // Phase 6 (part 2) — Mentions. For each monitored entity, find candidate
@@ -9,7 +9,6 @@ import { classifyMentions, type MentionInput } from "@workspace/ai";
 //   MENTION_SAMPLE (default 60)
 // Run: pnpm --filter @workspace/scripts run build-mentions
 const T = "00000000-0000-0000-0000-000000000001";
-const OWNER = process.env.WHATSAPP_OWNER;
 
 interface Entity {
   id: string;
@@ -18,7 +17,12 @@ interface Entity {
 }
 
 async function main(): Promise<void> {
-  if (!OWNER) throw new Error("WHATSAPP_OWNER is required.");
+  // Scan candidates across every active "Usuário" (WhatsApp number).
+  const owners = await getActiveOwnerPhones(pool);
+  if (owners.length === 0)
+    throw new Error(
+      "No active WhatsApp owner (whatsapp_accounts empty and WHATSAPP_OWNER unset).",
+    );
   const sample = Number(process.env.MENTION_SAMPLE ?? "60");
 
   const { rows: entities } = await pool.query<Entity>(
@@ -48,14 +52,14 @@ async function main(): Promise<void> {
                 coalesce(nullif(m.message,''), m.caption, m.transcription) as text,
                 m.message_created_at, m.sender_phone
            from whatsapp_messages m
-          where m.whatsapp_owner = $1
-            and coalesce(nullif(m.sender_phone,''),'') <> $2
+          where m.whatsapp_owner = any($1)
+            and coalesce(nullif(m.sender_phone,''),'') <> all($2)
             and coalesce(nullif(m.message,''), m.caption, m.transcription) is not null
        ) q
        where (${likeClauses.join(" or ")})
        order by message_created_at desc
        limit ${sample}`,
-      [OWNER, OWNER, ...likeParams],
+      [owners, owners, ...likeParams],
     );
     console.log(`  [${ent.name}] ${cands.length} candidate messages.`);
     if (cands.length === 0) continue;

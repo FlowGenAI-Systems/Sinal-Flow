@@ -15,9 +15,9 @@ import type { Pool } from "pg";
 // Returns the number of contacts that matched at least one message.
 export async function refreshContactMsgCounts(
   pool: Pool,
-  opts: { owner: string; tenantId: string },
+  opts: { owners: string[]; tenantId: string },
 ): Promise<number> {
-  const { owner, tenantId } = opts;
+  const { owners, tenantId } = opts;
 
   // Reset + recompute run in a single transaction so a mid-run failure can
   // never leave contacts temporarily zeroed (the reset zeroes everyone first so
@@ -34,7 +34,7 @@ export async function refreshContactMsgCounts(
          select coalesce(nullif(chat_id,''), nullif(contact_phone,'')) as phone,
                 count(*)::int as msg_count
            from whatsapp_messages
-          where whatsapp_owner = $1
+          where whatsapp_owner = any($1)
             and chat_type = 'private'
             and coalesce(nullif(chat_id,''), nullif(contact_phone,'')) is not null
           group by 1
@@ -43,7 +43,7 @@ export async function refreshContactMsgCounts(
           set msg_count = v.msg_count, msg_count_at = now()
          from vol v
         where c.tenant_id = $2 and c.primary_phone = v.phone`,
-      [owner, tenantId],
+      [owners, tenantId],
     );
     await client.query("commit");
     return res.rowCount ?? 0;

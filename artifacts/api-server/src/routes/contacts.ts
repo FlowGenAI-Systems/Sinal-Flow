@@ -2,7 +2,7 @@ import { Router, type IRouter } from "express";
 import { z } from "zod/v4";
 import { pool } from "@workspace/db";
 import { analyzeContact } from "@workspace/ai";
-import { OWNER, requireOwnerTenant } from "../lib/scope";
+import { getOwners, getSelectedAccount, requireOwnerTenant } from "../lib/scope";
 import { requireAuth, type AuthedRequest } from "../lib/auth";
 
 const router: IRouter = Router();
@@ -62,6 +62,21 @@ router.get("/contacts", async (req: AuthedRequest, res) => {
       ? ` and exists (select 1 from tasks tk where tk.tenant_id = $1 and tk.contact_id = c.id and tk.done = false)`
       : "";
 
+  // When a specific usuário (WhatsApp number) is selected, narrow the CRM list
+  // to contacts that actually exchanged DMs with that number — derived live from
+  // whatsapp_messages (no owner column on contacts). "Todos" keeps the full CRM.
+  const account = getSelectedAccount();
+  let ownerClause = "";
+  if (account) {
+    params.push(account);
+    ownerClause = ` and exists (
+      select 1 from whatsapp_messages m
+       where m.whatsapp_owner = $${params.length}
+         and m.chat_type = 'private'
+         and coalesce(nullif(m.chat_id,''), nullif(m.contact_phone,'')) = c.primary_phone
+    )`;
+  }
+
   const sort = req.query.sort;
   const orderBy =
     sort === "volume"
@@ -84,7 +99,7 @@ router.get("/contacts", async (req: AuthedRequest, res) => {
                where cl.contact_id = c.id
             ), '[]'::json) as labels
        from contacts c
-      where c.tenant_id = $1${labelClause}${searchClause}${categoryClause}${hasTasksClause}
+      where c.tenant_id = $1${labelClause}${searchClause}${categoryClause}${hasTasksClause}${ownerClause}
       order by ${orderBy}`,
     params,
   );
@@ -96,6 +111,18 @@ router.get("/contacts", async (req: AuthedRequest, res) => {
 // so the UI can deep-link straight into the CRM ficha.
 router.get("/contacts/vip", async (req: AuthedRequest, res) => {
   const t = req.auth!.tenantId;
+  const params: unknown[] = [t];
+  const account = getSelectedAccount();
+  let ownerClause = "";
+  if (account) {
+    params.push(account);
+    ownerClause = ` and exists (
+      select 1 from whatsapp_messages m
+       where m.whatsapp_owner = $${params.length}
+         and m.chat_type = 'private'
+         and coalesce(nullif(m.chat_id,''), nullif(m.contact_phone,'')) = c.primary_phone
+    )`;
+  }
   const { rows } = await pool.query(
     `select c.id, c.display_name, c.primary_phone, c.description,
             c.dominant_category, c.last_interaction_at,
@@ -115,9 +142,9 @@ router.get("/contacts/vip", async (req: AuthedRequest, res) => {
           select 1 from contact_labels cl
             join labels l on l.id = cl.label_id
            where cl.contact_id = c.id and lower(l.name) = 'vip'
-        )
+        )${ownerClause}
       order by c.last_interaction_at desc nulls last`,
-    [t],
+    params,
   );
   res.json({ contacts: rows });
 });
@@ -310,11 +337,11 @@ router.get("/contacts/:id/messages", async (req: AuthedRequest, res) => {
     `select message_id, direction, message_created_at,
             coalesce(nullif(message,''), caption, transcription) as text
        from whatsapp_messages
-      where whatsapp_owner = $1 and chat_type = 'private'
+      where whatsapp_owner = any($1) and chat_type = 'private'
         and (chat_id = $2 or nullif(contact_phone,'') = $2)
       order by message_created_at asc
       limit 500`,
-    [OWNER, phone],
+    [getOwners(), phone],
   );
   res.json({ messages: rows });
 });
@@ -366,9 +393,9 @@ router.get("/contacts/:id/metrics", async (req: AuthedRequest, res) => {
             min(message_created_at) as first_at,
             max(message_created_at) as last_at
        from whatsapp_messages
-      where whatsapp_owner = $1 and chat_type = 'private'
+      where whatsapp_owner = any($1) and chat_type = 'private'
         and (chat_id = $2 or nullif(contact_phone,'') = $2)`,
-    [OWNER, phone],
+    [getOwners(), phone],
   );
 
   const topics = await pool.query(
@@ -377,13 +404,13 @@ router.get("/contacts/:id/metrics", async (req: AuthedRequest, res) => {
        join message_enrichment e
          on e.message_id = m.message_id and e.tenant_id = $3
        cross join lateral unnest(e.topics) as tp
-      where m.whatsapp_owner = $1 and m.chat_type = 'private'
+      where m.whatsapp_owner = any($1) and m.chat_type = 'private'
         and (m.chat_id = $2 or nullif(m.contact_phone,'') = $2)
         and e.topics is not null
       group by tp
       order by count desc, tp asc
       limit 8`,
-    [OWNER, phone, t],
+    [getOwners(), phone, t],
   );
 
   res.json({
@@ -415,12 +442,12 @@ router.get("/contacts/:id/links", async (req: AuthedRequest, res) => {
                    'https?://[^\\s]+', 'g'
                  ))[1] as url
            from whatsapp_messages
-          where whatsapp_owner = $1 and chat_type = 'private'
+          where whatsapp_owner = any($1) and chat_type = 'private'
             and (chat_id = $2 or nullif(contact_phone,'') = $2)
        ) s
       order by message_created_at desc
       limit 200`,
-    [OWNER, phone],
+    [getOwners(), phone],
   );
   res.json({ links: rows });
 });
@@ -471,11 +498,11 @@ router.post("/contacts/:id/analysis", async (req: AuthedRequest, res) => {
     `select direction, message_created_at,
             coalesce(nullif(message,''), caption, transcription) as text
        from whatsapp_messages
-      where whatsapp_owner = $1 and chat_type = 'private'
+      where whatsapp_owner = any($1) and chat_type = 'private'
         and (chat_id = $2 or nullif(contact_phone,'') = $2)
         and coalesce(nullif(message,''), caption, transcription) is not null
       order by message_created_at asc`,
-    [OWNER, phone],
+    [getOwners(), phone],
   );
 
   if (msgs.length <= ANALYSIS_MIN_MESSAGES) {

@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { pool } from "@workspace/db";
-import { OWNER } from "../lib/scope";
+import { getOwners } from "../lib/scope";
 import { requireAuth, type AuthedRequest } from "../lib/auth";
 
 const router: IRouter = Router();
@@ -26,14 +26,14 @@ router.get("/groups", async (req: AuthedRequest, res) => {
                 count(distinct sender_phone)::int as participants,
                 max(message_created_at) as last_activity_at
            from whatsapp_messages
-          where whatsapp_owner = $1 and chat_type = 'group' and chat_id is not null
+          where whatsapp_owner = any($1) and chat_type = 'group' and chat_id is not null
           group by chat_id
        ) g
        left join support_groups sg
               on sg.tenant_id = $2 and sg.chat_id = g.chat_id
       order by g.message_count desc
       limit $3`,
-    [OWNER, t, limit],
+    [getOwners(), t, limit],
   );
   res.json({ groups: rows });
 });
@@ -45,9 +45,9 @@ router.post("/groups/:chatId/support", async (req: AuthedRequest, res) => {
   const name = await pool.query<{ name: string | null }>(
     `select max(chat_name) as name
        from whatsapp_messages
-      where whatsapp_owner = $1 and chat_type = 'group' and chat_id = $2
+      where whatsapp_owner = any($1) and chat_type = 'group' and chat_id = $2
       having count(*) > 0`,
-    [OWNER, chatId],
+    [getOwners(), chatId],
   );
   if (name.rowCount === 0) {
     return res.status(404).json({ error: "not_found" });
@@ -86,10 +86,10 @@ router.get("/groups/:chatId/digest", async (req: AuthedRequest, res) => {
     `select message_id, sender_name, message_created_at,
             coalesce(nullif(message,''), caption, transcription) as text
        from whatsapp_messages
-      where whatsapp_owner = $1 and chat_id = $2 and chat_type = 'group'
+      where whatsapp_owner = any($1) and chat_id = $2 and chat_type = 'group'
         and coalesce(nullif(message,''), caption, transcription) is not null
       order by message_created_at desc limit 20`,
-    [OWNER, chatId],
+    [getOwners(), chatId],
   );
   res.json({
     digest: digest.rows[0] ?? null,

@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { z } from "zod/v4";
 import { pool } from "@workspace/db";
 import { requireAuth, type AuthedRequest } from "../lib/auth";
+import { getSelectedAccount } from "../lib/scope";
 
 const router: IRouter = Router();
 router.use(requireAuth);
@@ -18,13 +19,29 @@ router.get("/tasks", async (req: AuthedRequest, res) => {
   else if (filter === "open") extra = "and tk.done = false";
   else if (filter === "done") extra = "and tk.done = true";
 
+  const params: unknown[] = [t];
+  // When a specific usuário is selected, keep only tasks tied to a contact that
+  // exchanged DMs with that number (derived from whatsapp_messages). Tasks with
+  // no contact can't be attributed to a number, so they only show in "Todos".
+  const account = getSelectedAccount();
+  let ownerClause = "";
+  if (account) {
+    params.push(account);
+    ownerClause = ` and exists (
+      select 1 from whatsapp_messages m
+       where m.whatsapp_owner = $${params.length}
+         and m.chat_type = 'private'
+         and coalesce(nullif(m.chat_id,''), nullif(m.contact_phone,'')) = c.primary_phone
+    )`;
+  }
+
   const { rows } = await pool.query(
     `select tk.*, c.display_name as contact_name
        from tasks tk
        left join contacts c on c.id = tk.contact_id
-      where tk.tenant_id = $1 ${extra}
+      where tk.tenant_id = $1 ${extra}${ownerClause}
       order by tk.done asc, tk.due_at asc nulls last, tk.created_at desc`,
-    [t],
+    params,
   );
   res.json({ tasks: rows });
 });

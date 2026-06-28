@@ -203,7 +203,7 @@ beforeAll(async () => {
   // msg_count is now a cached column populated by the contacts-maintenance job;
   // refresh it once after the fixtures are in place so the list serves it.
   const { refreshContactMsgCounts } = await import("@workspace/db");
-  await refreshContactMsgCounts(pool, { owner: OWNER, tenantId });
+  await refreshContactMsgCounts(pool, { owners: [OWNER], tenantId });
 });
 
 afterAll(async () => {

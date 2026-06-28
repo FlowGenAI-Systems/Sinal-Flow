@@ -14,6 +14,8 @@ import googleRouter from "./google";
 import searchRouter from "./search";
 import refreshRouter from "./refresh";
 import sellersRouter from "./sellers";
+import accountsRouter from "./accounts";
+import { ownerScope } from "../lib/scope";
 
 const router: IRouter = Router();
 
@@ -22,6 +24,10 @@ router.use(authRouter);
 // Mounted before the authed routers: its public OAuth callback must be reachable
 // without a session.
 router.use(googleRouter);
+// Resolve the per-request WhatsApp owner scope (?account=) before any data
+// router, so getOwners() is populated for every metrics/contacts handler.
+router.use(ownerScope);
+router.use(accountsRouter);
 router.use(metricsRouter);
 router.use(topicsRouter);
 router.use(groupsRouter);

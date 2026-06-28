@@ -1,4 +1,4 @@
-import { pool } from "@workspace/db";
+import { pool, getActiveOwnerPhones } from "@workspace/db";
 import { classifyBatch, activeClassifyModel, type ClassifyInput } from "@workspace/ai";
 
 // Phase 3 — SAMPLE classification. Pulls real text messages from the read-only
@@ -10,10 +10,14 @@ import { classifyBatch, activeClassifyModel, type ClassifyInput } from "@workspa
 //
 // Run: pnpm --filter @workspace/scripts run classify-sample
 const MVP_TENANT_ID = "00000000-0000-0000-0000-000000000001";
-const OWNER = process.env.WHATSAPP_OWNER;
 
 async function main(): Promise<void> {
-  if (!OWNER) throw new Error("WHATSAPP_OWNER is required.");
+  // Enrich every active "Usuário" (WhatsApp number), not just one.
+  const owners = await getActiveOwnerPhones(pool);
+  if (owners.length === 0)
+    throw new Error(
+      "No active WhatsApp owner (whatsapp_accounts empty and WHATSAPP_OWNER unset).",
+    );
   const sampleSize = Number(process.env.SAMPLE_SIZE ?? "50");
   const batchSize = Number(process.env.BATCH_SIZE ?? "20");
 
@@ -27,14 +31,14 @@ async function main(): Promise<void> {
             coalesce(nullif(m.message, ''), m.caption, m.transcription) as text
        from whatsapp_messages m
        left join message_enrichment e on e.message_id = m.message_id
-      where m.whatsapp_owner = $1
+      where m.whatsapp_owner = any($1)
         and m.message_id is not null
         and coalesce(nullif(m.message, ''), m.caption, m.transcription) is not null
         and length(coalesce(nullif(m.message, ''), m.caption, m.transcription)) >= 3
         and e.message_id is null
       order by m.message_created_at desc nulls last
       limit $2`,
-    [OWNER, sampleSize],
+    [owners, sampleSize],
   );
 
   console.log(
