@@ -11,6 +11,22 @@ import {
 
 const API_BASE = "/api";
 
+// Global vendor (account) filter. The selected owner_phone is injected into
+// EVERY request as ?account=... so the backend's ownerScope can narrow the data
+// to one vendor; "todos" (the default) sends no param, meaning all active
+// vendors. Kept as a module-level var (set by the AccountProvider) so it applies
+// centrally to every hook without threading it through each call site.
+let currentAccount = "todos";
+export function setApiAccount(account: string): void {
+  currentAccount = account || "todos";
+}
+
+function withAccount(path: string): string {
+  if (!currentAccount || currentAccount === "todos") return path;
+  const sep = path.includes("?") ? "&" : "?";
+  return `${path}${sep}account=${encodeURIComponent(currentAccount)}`;
+}
+
 export class ApiError extends Error {
   status: number;
   data: unknown;
@@ -25,7 +41,7 @@ async function apiFetch<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
+  const res = await fetch(withAccount(`${API_BASE}${path}`), {
     credentials: "include",
     headers: {
       ...(options.body ? { "Content-Type": "application/json" } : {}),
@@ -60,6 +76,19 @@ export interface AuthUser {
   userId: string;
   tenantId: string;
   email: string | null;
+}
+
+export interface Account {
+  phone: string;
+  name: string | null;
+}
+
+export interface ManagedAccount {
+  id: string;
+  phone: string;
+  name: string;
+  active: boolean;
+  created_at: string | null;
 }
 
 export type RefreshStatus = "running" | "completed" | "failed";
@@ -505,6 +534,8 @@ export interface SearchResp {
 
 export const qk = {
   me: ["auth", "me"] as const,
+  accounts: ["accounts"] as const,
+  accountsManage: ["accounts", "manage"] as const,
   overview: (days?: number) => ["metrics", "overview", days] as const,
   categories: (days?: number) =>
     ["metrics", "private", "categories", days] as const,
@@ -574,6 +605,69 @@ export function useMe(options?: { enabled?: boolean }) {
     queryFn: () => apiFetch<{ user: AuthUser }>("/auth/me"),
     retry: false,
     enabled: options?.enabled ?? true,
+  });
+}
+
+// Active accounts for the global "Usuários" selector.
+export function useAccounts() {
+  return useQuery({
+    queryKey: qk.accounts,
+    queryFn: () => apiFetch<{ accounts: Account[] }>("/accounts"),
+    select: (d) => d.accounts,
+  });
+}
+
+// Full management list (active + inactive) for the Usuários admin screen.
+export function useManagedAccounts() {
+  return useQuery({
+    queryKey: qk.accountsManage,
+    queryFn: () =>
+      apiFetch<{ accounts: ManagedAccount[] }>("/accounts/manage"),
+    select: (d) => d.accounts,
+  });
+}
+
+function invalidateAccountQueries(qc: ReturnType<typeof useQueryClient>) {
+  qc.invalidateQueries({ queryKey: qk.accounts });
+  qc.invalidateQueries({ queryKey: qk.accountsManage });
+}
+
+export function useCreateAccount() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { phone: string; name: string }) =>
+      apiFetch<{ account: ManagedAccount }>("/accounts", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => invalidateAccountQueries(qc),
+  });
+}
+
+export function useUpdateAccount() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: { name?: string; active?: boolean };
+    }) =>
+      apiFetch<{ account: ManagedAccount }>(`/accounts/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => invalidateAccountQueries(qc),
+  });
+}
+
+export function useDeleteAccount() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      apiFetch<{ ok: true }>(`/accounts/${id}`, { method: "DELETE" }),
+    onSuccess: () => invalidateAccountQueries(qc),
   });
 }
 

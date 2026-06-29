@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useLogout, useMe } from "@/lib/api";
 import { useTimeWindow, TIME_WINDOWS } from "@/lib/timeWindow";
+import { useAccount, ALL_ACCOUNTS } from "@/lib/accountFilter";
 import CommandPalette from "@/components/CommandPalette";
 import RefreshControl from "@/components/RefreshControl";
 import { FlowgenLogo } from "@/components/FlowgenLogo";
@@ -41,6 +42,9 @@ const relItems = [
   { href: "/salvos", label: "Salvos & Tasks", icon: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 12h-6l-2 3h-4l-2-3H2" strokeLinecap="round" strokeLinejoin="round"/><path d="M5.5 6h13l3.5 6v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6Z" strokeLinecap="round" strokeLinejoin="round"/></svg>
   ) },
+  { href: "/usuarios", label: "Usuários", icon: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" strokeLinecap="round"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8" strokeLinecap="round"/></svg>
+  ) },
   { href: "/conectores", label: "Conectores", icon: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 7 4.5 11.5a4.95 4.95 0 0 0 7 7L16 14M15 17l4.5-4.5a4.95 4.95 0 0 0-7-7L8 10" strokeLinecap="round" strokeLinejoin="round"/></svg>
   ) }
@@ -51,6 +55,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const { data: me } = useMe();
   const logout = useLogout();
   const { days, setDays, option } = useTimeWindow();
+  const { account, setAccount, accounts } = useAccount();
+  const accountLabel =
+    account === ALL_ACCOUNTS
+      ? "Todos os usuários"
+      : accounts.find((a) => a.phone === account)?.name || account;
   const [paletteOpen, setPaletteOpen] = useState(false);
 
   useEffect(() => {
@@ -148,6 +157,41 @@ export default function AppShell({ children }: { children: ReactNode }) {
             <span className="text-[13px] flex-1 text-left">Buscar…</span>
             <kbd className="font-mono text-[10.5px] text-[var(--muted-2)] bg-[var(--surface-3)] border border-[var(--border)] rounded-[5px] px-[5px] py-[1px]">⌘K</kbd>
           </button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="flex items-center gap-[7px] bg-[var(--surface-2)] border border-[var(--border)] p-[7px_12px] rounded-[var(--radius-sm)] text-[12.5px] text-[var(--muted)] cursor-pointer hover:border-[var(--accent-dim)] transition-colors outline-none max-w-[200px]"
+              >
+                <span className="truncate">{accountLabel}</span>
+                <ChevronDown className="w-[14px] h-[14px] shrink-0" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[200px]">
+              <DropdownMenuItem
+                onSelect={() => setAccount(ALL_ACCOUNTS)}
+                className="text-[13px] flex items-center gap-2"
+              >
+                <Check
+                  className={`w-3.5 h-3.5 ${account === ALL_ACCOUNTS ? "opacity-100 text-[var(--accent)]" : "opacity-0"}`}
+                />
+                Todos os usuários
+              </DropdownMenuItem>
+              {accounts.map((a) => (
+                <DropdownMenuItem
+                  key={a.phone}
+                  onSelect={() => setAccount(a.phone)}
+                  className="text-[13px] flex items-center gap-2"
+                >
+                  <Check
+                    className={`w-3.5 h-3.5 ${account === a.phone ? "opacity-100 text-[var(--accent)]" : "opacity-0"}`}
+                  />
+                  {a.name || a.phone}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

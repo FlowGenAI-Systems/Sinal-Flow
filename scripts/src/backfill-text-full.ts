@@ -1,4 +1,4 @@
-import { pool } from "@workspace/db";
+import { pool, getActiveOwnerPhones } from "@workspace/db";
 import { classifyBatch, activeClassifyModel, type ClassifyInput } from "@workspace/ai";
 
 // Phase 4 — FULL text backfill. Classifies every un-enriched text-bearing message
@@ -14,7 +14,6 @@ import { classifyBatch, activeClassifyModel, type ClassifyInput } from "@workspa
 //   PAGE          rows fetched per loop (default 900)
 //   MAX_MESSAGES  optional cap for a bounded run (default: all)
 const MVP_TENANT_ID = "00000000-0000-0000-0000-000000000001";
-const OWNER = process.env.WHATSAPP_OWNER;
 
 interface Row {
   message_id: string;
@@ -105,7 +104,12 @@ async function runPool(batches: Row[][], concurrency: number): Promise<number> {
 }
 
 async function main(): Promise<void> {
-  if (!OWNER) throw new Error("WHATSAPP_OWNER is required.");
+  // Enrich every active "Usuário" (WhatsApp number), not just one.
+  const owners = await getActiveOwnerPhones(pool);
+  if (owners.length === 0)
+    throw new Error(
+      "No active WhatsApp owner (whatsapp_accounts empty and WHATSAPP_OWNER unset).",
+    );
   const batchSize = Number(process.env.BATCH_SIZE ?? "15");
   const concurrency = Number(process.env.CONCURRENCY ?? "6");
   const page = Number(process.env.PAGE ?? "900");
@@ -126,14 +130,14 @@ async function main(): Promise<void> {
               coalesce(nullif(m.message, ''), m.caption, m.transcription) as text
          from whatsapp_messages m
          left join message_enrichment e on e.message_id = m.message_id
-        where m.whatsapp_owner = $1
+        where m.whatsapp_owner = any($1)
           and m.message_id is not null
           and coalesce(nullif(m.message, ''), m.caption, m.transcription) is not null
           and length(coalesce(nullif(m.message, ''), m.caption, m.transcription)) >= 3
           and e.message_id is null
         order by m.message_created_at desc nulls last
         limit $2`,
-      [OWNER, limit],
+      [owners, limit],
     );
 
     if (rows.length === 0) {

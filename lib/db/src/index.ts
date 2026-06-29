@@ -26,3 +26,4 @@ export const db = drizzle(pool, { schema });
 export * from "./schema";
 export * from "./refresh";
 export * from "./pipeline";
+export * from "./accounts";

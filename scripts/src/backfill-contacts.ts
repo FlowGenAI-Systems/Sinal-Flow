@@ -1,4 +1,4 @@
-import { pool, refreshContactMsgCounts } from "@workspace/db";
+import { pool, refreshContactMsgCounts, getActiveOwnerPhones } from "@workspace/db";
 
 // Derives CRM contacts from private (DM) chats. Per PRD: CRM = the ~521 DM
 // contacts + manually promoted ones. DM contacts are keyed by chat_id (which is
@@ -7,10 +7,14 @@ import { pool, refreshContactMsgCounts } from "@workspace/db";
 //
 // Run: pnpm --filter @workspace/scripts run backfill-contacts
 const MVP_TENANT_ID = "00000000-0000-0000-0000-000000000001";
-const OWNER = process.env.WHATSAPP_OWNER;
 
 async function main(): Promise<void> {
-  if (!OWNER) throw new Error("WHATSAPP_OWNER is required.");
+  // Derive DM contacts across every active "Usuário" (WhatsApp number).
+  const owners = await getActiveOwnerPhones(pool);
+  if (owners.length === 0)
+    throw new Error(
+      "No active WhatsApp owner (whatsapp_accounts empty and WHATSAPP_OWNER unset).",
+    );
 
   const ins = await pool.query(
     `insert into contacts
@@ -21,14 +25,14 @@ async function main(): Promise<void> {
             max(message_created_at),
             'dm'
        from whatsapp_messages
-      where whatsapp_owner = $1 and chat_type = 'private' and chat_id is not null
+      where whatsapp_owner = any($1) and chat_type = 'private' and chat_id is not null
       group by chat_id
      on conflict (tenant_id, primary_phone) where primary_phone is not null
      do update set
         display_name = coalesce(excluded.display_name, contacts.display_name),
         last_interaction_at = greatest(contacts.last_interaction_at, excluded.last_interaction_at),
         updated_at = now()`,
-    [OWNER, MVP_TENANT_ID],
+    [owners, MVP_TENANT_ID],
   );
   console.log(`✓ upserted ${ins.rowCount} DM contacts.`);
 
@@ -41,7 +45,7 @@ async function main(): Promise<void> {
               ) as rn
          from message_enrichment e
          join whatsapp_messages m on m.message_id = e.message_id
-        where m.whatsapp_owner = $1 and m.chat_type = 'private'
+        where m.whatsapp_owner = any($1) and m.chat_type = 'private'
           and e.category is not null
         group by m.chat_id, e.category
      )
@@ -49,14 +53,14 @@ async function main(): Promise<void> {
         set dominant_category = d.category, updated_at = now()
        from dom d
       where d.rn = 1 and c.tenant_id = $2 and c.primary_phone = d.chat_id`,
-    [OWNER, MVP_TENANT_ID],
+    [owners, MVP_TENANT_ID],
   );
   console.log(`✓ set dominant_category for ${dom.rowCount} contacts.`);
 
   // Refresh the cached per-contact message volume so the /contacts list reads a
   // cheap column instead of scanning whatsapp_messages on every request.
   const refreshed = await refreshContactMsgCounts(pool, {
-    owner: OWNER,
+    owners,
     tenantId: MVP_TENANT_ID,
   });
   console.log(`✓ refreshed msg_count for ${refreshed} contacts.`);

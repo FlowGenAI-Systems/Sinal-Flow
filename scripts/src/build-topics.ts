@@ -1,4 +1,4 @@
-import { pool } from "@workspace/db";
+import { pool, getActiveOwnerPhones } from "@workspace/db";
 import {
   clusterTopics,
   TOPIC_BLACKLIST,
@@ -12,7 +12,6 @@ import {
 //
 // Run: pnpm --filter @workspace/scripts run build-topics
 const T = "00000000-0000-0000-0000-000000000001";
-const OWNER = process.env.WHATSAPP_OWNER;
 
 interface Row {
   message_id: string;
@@ -27,14 +26,17 @@ function toIso(v: Date | string | null): string | null {
   return v instanceof Date ? v.toISOString() : String(v);
 }
 
-async function buildScope(scope: "private" | "group"): Promise<number> {
+async function buildScope(
+  scope: "private" | "group",
+  owners: string[],
+): Promise<number> {
   // Group pautas exclude user-managed support_groups (kept consistent with the
   // Overview "Temas nos grupos" cloud) so support/noise groups don't dominate.
   const { rows } = await pool.query<Row>(
     `select e.message_id, m.chat_id, m.sender_phone, e.topics, m.message_created_at
        from message_enrichment e
        join whatsapp_messages m on m.message_id = e.message_id
-        and m.whatsapp_owner = $3
+        and m.whatsapp_owner = any($3)
       where e.tenant_id = $1 and e.chat_type = $2
         and e.topics is not null and array_length(e.topics, 1) > 0
         and (
@@ -44,7 +46,7 @@ async function buildScope(scope: "private" | "group"): Promise<number> {
              where sg.tenant_id = $1 and sg.chat_id = m.chat_id
           )
         )`,
-    [T, scope, OWNER],
+    [T, scope, owners],
   );
   if (rows.length === 0) {
     console.log(`  [${scope}] no enriched messages with topics.`);
@@ -179,13 +181,18 @@ async function buildScope(scope: "private" | "group"): Promise<number> {
 }
 
 async function main(): Promise<void> {
-  if (!OWNER) throw new Error("WHATSAPP_OWNER is required.");
+  // Cluster pautas across every active "Usuário" (WhatsApp number).
+  const owners = await getActiveOwnerPhones(pool);
+  if (owners.length === 0)
+    throw new Error(
+      "No active WhatsApp owner (whatsapp_accounts empty and WHATSAPP_OWNER unset).",
+    );
   console.log("Building topics...");
   // SCOPE=private|group runs a single scope (each clustering call can exceed a
   // shell timeout); default rebuilds both. Each scope's writes are independent.
   const only = process.env.SCOPE;
-  const a = only === "group" ? 0 : await buildScope("private");
-  const b = only === "private" ? 0 : await buildScope("group");
+  const a = only === "group" ? 0 : await buildScope("private", owners);
+  const b = only === "private" ? 0 : await buildScope("group", owners);
 
   const { rows: cross } = await pool.query<{ n: string }>(
     `select count(*)::int n from (
